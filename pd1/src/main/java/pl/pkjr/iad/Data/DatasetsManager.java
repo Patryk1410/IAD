@@ -1,9 +1,9 @@
-package pl.pkjr.iad.Data;
+package pl.pkjr.iad.data;
+
+import org.la4j.Matrix;
+import pl.pkjr.iad.Utility.MatrixUtility;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Created by patry on 04/03/2017.
@@ -29,7 +29,8 @@ public class DatasetsManager {
         return datasetsNames;
     }
 
-    public void getDataset() {
-        
+    public Matrix getDataset(int datasetNumber) {
+        String fileName = "./datasets/testData" + Integer.toString(datasetNumber) + ".txt";
+        return MatrixUtility.readFromFile(fileName);
     }
 }

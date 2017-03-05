@@ -8,14 +8,6 @@ import java.util.Scanner;
  */
 public class ConsoleController {
 
-    public static void clear() {
-        try {
-            Runtime.getRuntime().exec("cls");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void print(String text) {
         System.out.println(text);
     }
