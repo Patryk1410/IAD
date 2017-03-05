@@ -1,10 +1,8 @@
 package pl.pkjr.iad.Utility;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.la4j.Matrix;
@@ -12,13 +10,13 @@ import org.la4j.Vector;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.util.List;
 
 /**
  * Created by patry on 04/03/2017.
  */
 public class ChartsUtility {
+
     public static void plotScatter(Matrix X, Vector y) {
         XYSeriesCollection points = getPoints(X, y);
         JFreeChart scatterPlot = ChartFactory.createScatterPlot("Points", "x1", "x2", points);

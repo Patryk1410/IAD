@@ -2,7 +2,6 @@ package pl.pkjr.iad.machineLearning;
 
 import org.la4j.Matrix;
 import org.la4j.Vector;
-import org.la4j.matrix.dense.Basic2DMatrix;
 import org.la4j.vector.dense.BasicVector;
 import pl.pkjr.iad.Utility.ChartsUtility;
 
@@ -22,7 +21,6 @@ public class LinearNeuron {
     private int n;
     private int m;
     private double alpha;
-    private int currentEpoch;
     private int maxEpochs;
 
     public LinearNeuron(Vector y, Matrix X, double alpha, int maxEpochs) {
@@ -53,8 +51,6 @@ public class LinearNeuron {
     public void fit() {
         ChartsUtility.plotLine(X, y, theta, 1);
         for (int i = 0; i < maxEpochs; ++i) {
-            System.out.println("Epoch #" + Integer.toString(i));
-            System.out.println("Theta: " + theta.toString());
             predict();
             int numberOfErrors = 0;
             for (int j = 0; j < m; ++j) {
@@ -66,7 +62,6 @@ public class LinearNeuron {
                     numberOfErrors++;
                 }
             }
-            System.out.println("Errors " + Integer.toString(numberOfErrors));
             epochErrors.add(1.0 * numberOfErrors / m);
             if (numberOfErrors == 0) break;
         }
@@ -82,9 +77,6 @@ public class LinearNeuron {
     }
 
     private Vector formula() {
-//        return X.getColumn(0).multiply(theta.get(0))
-//                .add(X.getColumn(1).multiply(theta.get(1)))
-//                .add(X.getColumn(2).multiply(theta.get(2)));
         return theta.multiply(X.transpose());
     }
 }

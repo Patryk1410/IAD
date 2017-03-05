@@ -8,10 +8,6 @@ import pl.pkjr.iad.Utility.ChartsUtility;
 import pl.pkjr.iad.Utility.MatrixUtility;
 import pl.pkjr.iad.machineLearning.LinearNeuron;
 
-/**
- * Hello world!
- *
- */
 public class App 
 {
     private final String kSelectDataset = "Select dataset: \n";
@@ -19,7 +15,11 @@ public class App
     private final String kSelectNumberOfEpochs = "Select number of epochs: ";
 
     private int selectedDataset = 1;
-    private int inputNumber;
+    private int numberOfEpochs;
+    private double alpha;
+
+    private Matrix X;
+    private Vector y;
 
     public static void main( String[] args )
     {
@@ -27,16 +27,39 @@ public class App
         app.run();
     }
 
-    public void run() {
+    private void run() {
+        pickDataset();
+        prepareMatrices();
+        plotScatter();
+        prepareLearningParameters();
+        trainNeuron();
+    }
+
+    private void pickDataset() {
         ConsoleController.print(kSelectDataset);
         ConsoleController.print(DatasetsManager.getInstance().getDatasetsNames());
-        inputNumber = ConsoleController.getInt();
-        selectedDataset = inputNumber >= 1 && inputNumber <= 3 ? inputNumber : selectedDataset;
+        selectedDataset = ConsoleController.getInt(1, 3);
+    }
+
+    private void prepareMatrices() {
         Matrix Dataset = DatasetsManager.getInstance().getDataset(selectedDataset);
-        Matrix X = MatrixUtility.getX(Dataset);
-        Vector y = MatrixUtility.getY(Dataset);
+        X = MatrixUtility.getX(Dataset);
+        y = MatrixUtility.getY(Dataset);
+    }
+
+    private void plotScatter() {
         ChartsUtility.plotScatter(X, y);
-        LinearNeuron neuron = new LinearNeuron(y, X, 0.01, 100);
+    }
+
+    private void prepareLearningParameters() {
+        ConsoleController.print(kSelectAlpha);
+        alpha = ConsoleController.getDouble(0, 1);
+        ConsoleController.print(kSelectNumberOfEpochs);
+        numberOfEpochs = ConsoleController.getInt(1, 1000);
+    }
+
+    private void trainNeuron() {
+        LinearNeuron neuron = new LinearNeuron(y, X, alpha, numberOfEpochs);
         neuron.fit();
     }
 }
