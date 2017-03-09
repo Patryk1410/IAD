@@ -28,7 +28,7 @@ public class App
         app.run();
     }
 
-    public App() {
+    private App() {
         shouldContinue = true;
     }
 

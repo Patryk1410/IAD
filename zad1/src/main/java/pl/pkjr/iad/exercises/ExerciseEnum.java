@@ -10,7 +10,7 @@ public enum  ExerciseEnum {
 
     private Integer value;
 
-    private ExerciseEnum(Integer value) {
+    ExerciseEnum(Integer value) {
         this.value = value;
     }
 }
