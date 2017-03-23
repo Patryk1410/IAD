@@ -23,11 +23,6 @@ public class App
     private static boolean shouldContinue;
     private int input;
 
-    public static void main( String[] args ) {
-        App app = new App();
-        app.run();
-    }
-
     private App() {
         shouldContinue = true;
     }
@@ -58,5 +53,10 @@ public class App
 
     public void setShouldContinue(boolean shouldContinue) {
         App.shouldContinue = shouldContinue;
+    }
+
+    public static void main( String[] args ) {
+        App app = new App();
+        app.run();
     }
 }
