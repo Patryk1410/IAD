@@ -1,99 +1,67 @@
 package pl.pkjr.iad.machineLearning;
 
 import org.la4j.Matrix;
-import org.la4j.matrix.dense.Basic2DMatrix;
+import org.la4j.Vector;
 
 /**
  * Created by patry on 08/03/2017.
  */
 public class NeuralNetwork {
 
-    private Matrix X;
-    private Matrix Y;
-    private Matrix[] Theta;
-    private Matrix[] Z;
-    private int n;
-    private int m;
-    private int numberOfHiddenLayers;
-    private int[] numbersOfNeuronsInHiddenLayer;
-    private int numberOfNeuronsInOutputLayer;
-    private double alpha;
-    private double lambda;
-    private int maxEpochs;
+    Matrix X; //training samples
+    Matrix Y; //Expected values
+    Matrix[] Theta; //weights of connection between each pair of connected neurons
+    Matrix[] Z; //output of j-th neuron in i-th training example in k-th layer
+    int n; //number of features
+    int m; //number of training examples
+    int numberOfHiddenLayers;
+    int[] numbersOfNeuronsInEachLayer; //without bias
+    double alpha; //learning rate
+    double lambda; //regularization rate
+    double epsilon; //range of theta initial values
+    int maxEpochs;
+    NeuralNetworkUtil util;
 
-    public NeuralNetwork(Matrix x, Matrix y, int numberOfHiddenLayers, int[] numbersOfNeuronsInHiddenLayer,
-                         int numberOfNeuronsInOutputLayer, double alpha, double lambda, int maxEpochs) {
+    public NeuralNetwork(Matrix x, Matrix y, int numberOfHiddenLayers, int[] numbersOfNeuronsInEachLayer,
+                         double alpha, double lambda, double epsilon,
+                         int maxEpochs) {
         X = x;
         Y = y;
         this.numberOfHiddenLayers = numberOfHiddenLayers;
-        this.numbersOfNeuronsInHiddenLayer = numbersOfNeuronsInHiddenLayer;
-        this.numberOfNeuronsInOutputLayer = numberOfNeuronsInOutputLayer;
+        this.numbersOfNeuronsInEachLayer = numbersOfNeuronsInEachLayer;
         this.alpha = alpha;
         this.lambda = lambda;
+        this.epsilon = epsilon;
         this.maxEpochs = maxEpochs;
-        initZ();
-        initParameters();
-    }
-
-    private void initParameters() {
-        n = X.columns();
-        m = X.rows();
-        randomlyInitTheta();
-    }
-
-    private void randomlyInitTheta() {
-        Theta = new Matrix[numberOfHiddenLayers + 1];
-        for (int i = 0; i < Theta.length; ++i) {
-            if (i == 0) {
-                initFirstTheta();
-            } else if (i != numberOfHiddenLayers + numberOfNeuronsInOutputLayer - 1) {
-                initHiddenTheta(i);
-            } else {
-                initOutputTheta();
-            }
-        }
-    }
-
-    private void initZ() {
-        Z = new Matrix[numberOfHiddenLayers + 1];
-        for (int i = 0; i < Z.length; ++i) {
-            Z[i] = new Basic2DMatrix()
-        }
-    }
-
-    //TODO if there is no hidden layer change this method
-    private void initFirstTheta() {
-        int rows = n;
-        int columns = numbersOfNeuronsInHiddenLayer[0] - 1;
-        Theta[0] = new Basic2DMatrix(rows, columns);
-    }
-
-    //TODO if there is no hidden layer change this method
-    private void initHiddenTheta(int i) {
-        int rows = numbersOfNeuronsInHiddenLayer[i - 1];
-        int columns = numbersOfNeuronsInHiddenLayer[i] - 1;
-        Theta[i] = new Basic2DMatrix(rows, columns);
-    }
-
-    //TODO if there is no hidden layer change this method
-    private void initOutputTheta() {
-        int lastIndex = numberOfHiddenLayers - 1;
-        int rows = numbersOfNeuronsInHiddenLayer[lastIndex];
-        int columns = numberOfNeuronsInOutputLayer;
-        Theta[lastIndex] = new Basic2DMatrix(rows, columns);
+        util = new NeuralNetworkUtil(this);
+        util.initParameters();
+        util.randomlyInitTheta();
+        util.initZ();
     }
 
     public void fit() {
-        for (int i = 0; i < numberOfHiddenLayers; ++i) {
+        for (int i = 0; i < Z.length; ++i) {
 
         }
     }
 
     public void predict() {
-
+        //Starting from i=1, because we don't need to predict values from input layer
+        for (int i = 1; i < Z.length; ++i) {
+            Matrix PreviousMatrix = MachineLearningAlgorithm.addColumOfOnesToMatrix(Z[i - 1]);
+            Matrix CurrentTheta = Theta[i - 1]; //i - 1, because we need first theta matrix to predict values for
+                                                //second layer
+            Z[i] = MachineLearningAlgorithm.sigmoid(PreviousMatrix.multiply(CurrentTheta));
+        }
     }
 
-    private void learn() {
+    public double J() {
+        //TODO: implement
+        return 0;
+    }
 
+    public Matrix[] gradients() {
+        //TODO: implement
+        return null;
     }
 }
