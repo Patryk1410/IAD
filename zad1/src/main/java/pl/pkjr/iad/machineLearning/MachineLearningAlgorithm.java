@@ -8,8 +8,10 @@ import org.la4j.Vector;
  */
 public class MachineLearningAlgorithm {
 
-    public static void gradientDescent(Matrix[] Theta, Matrix[] Gradients, double alpha, double lambda) {
-        //TODO: implement
+    public static void gradientDescent(Matrix[] Theta, Matrix[] Gradients, double alpha) {
+        for (int i = 0; i < Theta.length; ++i) {
+            Theta[i] = Theta[i].subtract(Gradients[i].multiply(alpha));
+        }
     }
 
 

@@ -64,12 +64,12 @@ public class NeuralNetwork {
         return costFunction.calculateCost(Theta, m, Y, Z[Z.length - 1], lambda);
     }
 
-    public Matrix[] gradients() {
+    public Matrix[] computeGradients() {
         //TODO: implement
         return null;
     }
 
-    //Getters and setters
+    //////////////Getters and setters//////////////
     public double getAlpha() {
         return alpha;
     }
