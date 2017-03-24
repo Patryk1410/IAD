@@ -1,6 +1,7 @@
 package pl.pkjr.iad.machineLearning;
 
 import org.la4j.Matrix;
+import org.la4j.Vector;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunction;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionSelector;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
@@ -15,6 +16,9 @@ public class NeuralNetwork {
     Matrix Y; //Expected values
     Matrix[] Theta; //weights of connection between each pair of connected neurons
     Matrix[] Z; //output of j-th neuron in i-th training example in k-th layer
+    Matrix[] A; //input of j-th neuron in i-th training example in k-th layer
+    Matrix[] Delta; //error of j-th neuron in i-th training example in k-th layer
+    Matrix[] Gradients; //gradients used in Gradient Descent algorithm
     CostFunction costFunction;
     int n; //number of features
     int m; //number of training examples
@@ -40,33 +44,63 @@ public class NeuralNetwork {
         this.costFunction = CostFunctionSelector.getCostFunction(costFunction);
         util = new NeuralNetworkUtil(this);
         util.initParameters();
-        util.randomlyInitTheta();
-        util.initZ();
     }
 
     public void fit() {
-        for (int i = 0; i < Z.length; ++i) {
-
+        for (int i = 0; i < maxEpochs; ++i) {
+            predict();
+            backpropagate();
         }
     }
 
     public void predict() {
         //Starting from i=1, because we don't need to predict values from input layer
         for (int i = 1; i < Z.length; ++i) {
-            Matrix PreviousMatrix = MatrixUtil.addColumnOfOnesToMatrix(Z[i - 1]);
+            Matrix PreviousMatrix =
+                    i == 1 ?
+                    MatrixUtil.addColumnOfOnesToMatrix(X) :
+                    MatrixUtil.addColumnOfOnesToMatrix(A[i - 2]);
             Matrix CurrentTheta = Theta[i - 1]; //i - 1, because we need first theta matrix to predict values for
                                                 //second layer
-            Z[i] = MatrixUtil.sigmoid(PreviousMatrix.multiply(CurrentTheta));
+            Z[i] = PreviousMatrix.multiply(CurrentTheta);
+            A[i - 1] = MatrixUtil.sigmoid(Z[i]);
         }
     }
 
     public double J() {
-        return costFunction.calculateCost(Theta, m, Y, Z[Z.length - 1], lambda);
+        return costFunction.calculateCost(Theta, m, Y, A[A.length - 1], lambda);
     }
 
-    public Matrix[] computeGradients() {
-        //TODO: implement
-        return null;
+    private void backpropagate() {
+
+        for (int j = Delta.length - 1; j >= 0; --j) {
+            if (j == Delta.length - 1) {
+                computeErrorsForOutputLayer();
+            } else if (j == Delta.length - 2){
+                computeErrorsForLastHiddenLayer();
+            } else {
+                computeErrorsForHiddenLayer(j);
+            }
+        }
+    }
+
+    private void computeErrorsForOutputLayer() {
+        int indexOfOutputLayer = numberOfHiddenLayers;
+        Delta[indexOfOutputLayer] = A[indexOfOutputLayer].subtract(Y);
+    }
+
+    private void computeErrorsForLastHiddenLayer() {
+        int indexOfOutputLayer = numberOfHiddenLayers;
+        int indexOfLastHiddenLayer = numberOfHiddenLayers - 1;
+        Delta[indexOfLastHiddenLayer] = MatrixUtil.elementwiseMultiply(
+                Delta[indexOfOutputLayer].multiply(Theta[indexOfOutputLayer].transpose()),
+                MatrixUtil.sigmoidDerivative(MatrixUtil.addColumnOfOnesToMatrix(Z[indexOfOutputLayer])));
+    }
+
+    private void computeErrorsForHiddenLayer(int index) {
+        Delta[index] = MatrixUtil.elementwiseMultiply(
+                Delta[index + 1].removeFirstColumn().multiply(Theta[index + 1].transpose()),
+                MatrixUtil.sigmoidDerivative(MatrixUtil.addColumnOfOnesToMatrix(Z[index + 1])));
     }
 
     //////////////Getters and setters//////////////

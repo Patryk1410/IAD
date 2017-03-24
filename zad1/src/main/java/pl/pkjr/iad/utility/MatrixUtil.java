@@ -11,16 +11,18 @@ public class MatrixUtil {
 
     private static final int SIGMOID_LARGE_VALUE = 1;
     private static final int SIGMOID_SMALL_VALUE = 0;
+    private static final int SIGMOID_GRADIENT_LARGE_VALUE = 0;
+    private static final int SIGMOID_GRADIENT_SMALL_VALUE = 0;
 
     public static Matrix sigmoid(Matrix M) {
         Matrix newMatrix = M.copy();
-        M.each((int i, int j, double value) -> {
+        newMatrix.each((int i, int j, double value) -> {
             if (value > 10) {
                 newMatrix.set(i, j, SIGMOID_LARGE_VALUE);
             } else if (value < -10) {
                 newMatrix.set(i, j, SIGMOID_SMALL_VALUE);
             } else {
-                value = 1 / (1 + Math.exp(-value));
+                value = sigmoid(value);
                 newMatrix.set(i, j, value);
             }
         });
@@ -28,8 +30,23 @@ public class MatrixUtil {
     }
 
     public static Matrix sigmoidDerivative(Matrix M) {
-        //TODO: implement
-        return null;
+        Matrix newMatrix = M.copy();
+        newMatrix.each((int i, int j, double value) -> {
+            if (value > 8) {
+                newMatrix.set(i, j, SIGMOID_GRADIENT_LARGE_VALUE);
+            } else if (value < -8) {
+                newMatrix.set(i, j, SIGMOID_GRADIENT_SMALL_VALUE);
+            } else {
+                double valueSigmoid = sigmoid(value);
+                value = valueSigmoid * (1 - valueSigmoid);
+                newMatrix.set(i, j, value);
+            }
+        });
+        return newMatrix;
+    }
+
+    private static double sigmoid(double value) {
+        return 1 / (1 + Math.exp(-value));
     }
 
     public static Matrix addColumnOfOnesToMatrix(Matrix M) {

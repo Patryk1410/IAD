@@ -13,6 +13,4 @@ public class MachineLearningAlgorithm {
             Theta[i] = Theta[i].subtract(Gradients[i].multiply(alpha));
         }
     }
-
-
 }

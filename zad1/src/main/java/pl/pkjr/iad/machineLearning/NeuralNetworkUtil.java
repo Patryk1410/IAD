@@ -25,9 +25,13 @@ public class NeuralNetworkUtil {
         network.n = network.X.columns();
         network.m = network.X.rows();
         randomlyInitTheta();
+        initZ();
+        initA();
+        initDelta();
+        initGradients();
     }
 
-    public void randomlyInitTheta() {
+    private void randomlyInitTheta() {
         initTheta();
         for (Matrix Theta : network.Theta) {
             for (int i = 0; i < Theta.rows(); ++i) {
@@ -48,13 +52,41 @@ public class NeuralNetworkUtil {
         }
     }
 
-    public void initZ() {
+    private void initZ() {
         network.Z = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_INPUT_LAYERS + NUMBER_OF_OUTPUT_LAYERS];
-        int rows = network.m;
-        for (int i = 0; i < network.Z.length; ++i) {
-            int columns = network.numbersOfNeuronsInEachLayer[i];
-            network.Z[i] = new Basic2DMatrix(rows, columns);
-        }
+//        int rows = network.m;
+//        for (int i = 0; i < network.Z.length; ++i) {
+//            int columns = network.numbersOfNeuronsInEachLayer[i];
+//            network.Z[i] = new Basic2DMatrix(rows, columns);
+//        }
         network.Z[0] = network.X.copy();
     }
+
+    private void initA() {
+        network.A = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
+//        int rows = network.m;
+//        for (int i = 0; i < network.A.length; ++i) {
+//            int columns = network.numbersOfNeuronsInEachLayer[i + 1];//i + 1 because we don't use activation function
+//                                                                     //on input layer to get output
+//            network.A[i] = new Basic2DMatrix(rows, columns);
+//        }
+    }
+
+    private void initDelta() {
+        network.Delta = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
+//        int rows = network.m;
+//        for (int i = 0; i < network.Delta.length; ++i) {
+//            int columns = network.numbersOfNeuronsInEachLayer[i + 1]; //i + 1 because we don't calculate error for
+//                                                                      //input layer
+//            network.Delta[i] = new Basic2DMatrix(rows, columns);
+//        }
+    }
+
+    private void initGradients() {
+        network.Gradients = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
+        for (int i = 0; i < network.Gradients.length; ++i) {
+            network.Gradients[i] = Matrix.zero(network.Theta[i].rows(), network.Theta[i].columns());
+        }
+    }
+
 }
