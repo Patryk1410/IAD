@@ -15,8 +15,8 @@ public class NeuralNetwork {
     Matrix X; //training samples
     Matrix Y; //Expected values
     Matrix[] Theta; //weights of connection between each pair of connected neurons
-    Matrix[] Z; //output of j-th neuron in i-th training example in k-th layer
-    Matrix[] A; //input of j-th neuron in i-th training example in k-th layer
+    Matrix[] Z; //input of j-th neuron in i-th training example in k-th layer
+    Matrix[] A; //output of j-th neuron in i-th training example in k-th layer
     Matrix[] Delta; //error of j-th neuron in i-th training example in k-th layer
     Matrix[] Gradients; //gradients used in Gradient Descent algorithm
     CostFunction costFunction;
@@ -72,11 +72,15 @@ public class NeuralNetwork {
     }
 
     private void backpropagate() {
+        computeErrors();
+        computeGradients();
+    }
 
+    private void computeErrors() {
         for (int j = Delta.length - 1; j >= 0; --j) {
             if (j == Delta.length - 1) {
                 computeErrorsForOutputLayer();
-            } else if (j == Delta.length - 2){
+            } else if (j == Delta.length - 2) {
                 computeErrorsForLastHiddenLayer();
             } else {
                 computeErrorsForHiddenLayer(j);
@@ -92,15 +96,25 @@ public class NeuralNetwork {
     private void computeErrorsForLastHiddenLayer() {
         int indexOfOutputLayer = numberOfHiddenLayers;
         int indexOfLastHiddenLayer = numberOfHiddenLayers - 1;
+        //TODO: split into separate lines so it's easier to debug
         Delta[indexOfLastHiddenLayer] = MatrixUtil.elementwiseMultiply(
                 Delta[indexOfOutputLayer].multiply(Theta[indexOfOutputLayer].transpose()),
                 MatrixUtil.sigmoidDerivative(MatrixUtil.addColumnOfOnesToMatrix(Z[indexOfOutputLayer])));
     }
 
     private void computeErrorsForHiddenLayer(int index) {
+        //TODO: split into separate lines so it's easier to debug
         Delta[index] = MatrixUtil.elementwiseMultiply(
                 Delta[index + 1].removeFirstColumn().multiply(Theta[index + 1].transpose()),
                 MatrixUtil.sigmoidDerivative(MatrixUtil.addColumnOfOnesToMatrix(Z[index + 1])));
+    }
+
+    private void computeGradients() {
+        for (int i = 0; i < m; ++i) {
+            for (int j = Gradients.length - 1; j >= 0; --j) {
+                Gradients[j].add()
+            }
+        }
     }
 
     //////////////Getters and setters//////////////
