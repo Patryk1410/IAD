@@ -20,11 +20,11 @@ public class NeuralNetworkTest {
     @BeforeClass
     public static void init() {
         double[][] dataX = {{1, 2, 3}, {3, 4, 5}};
-        double[][] dataY = {{1, 2}};
+        double[][] dataY = {{0}, {1}};
         Matrix X = new Basic2DMatrix(dataX);
         Matrix Y = new Basic2DMatrix(dataY);
         int[] neurons = {3, 2, 1};
-        network = new NeuralNetwork(X, Y, 1, neurons, 0.1, 0.1, 1, 100,
+        network = new NeuralNetwork(X, Y, 1, neurons, 0.1, 1, 1, 100,
                 CostFunctionType.logarithmic);
     }
 
@@ -44,4 +44,8 @@ public class NeuralNetworkTest {
         Assert.assertEquals(0, cost, 0.01);
     }
 
+    @Test
+    public void testRunNetwork() {
+        network.fit();
+    }
 }

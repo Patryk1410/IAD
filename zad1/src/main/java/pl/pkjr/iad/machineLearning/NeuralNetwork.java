@@ -74,6 +74,8 @@ public class NeuralNetwork {
     private void backpropagate() {
         computeErrors();
         computeGradients();
+        regularizeGradients();
+        MachineLearningAlgorithm.gradientDescent(Theta, Gradients, alpha);
     }
 
     private void computeErrors() {
@@ -110,10 +112,25 @@ public class NeuralNetwork {
     }
 
     private void computeGradients() {
-        for (int i = 0; i < m; ++i) {
-            for (int j = Gradients.length - 1; j >= 0; --j) {
-                Gradients[j].add()
+        for (int j = Gradients.length - 1; j >= 0; --j) {
+            if (j == Gradients.length - 1) {
+                Gradients[j] = Gradients[j].add(MatrixUtil.addColumnOfOnesToMatrix(A[j - 1]).transpose().multiply(Delta[j]));
+            } else if (j == 0) {
+                Gradients[j] = Gradients[j].add(MatrixUtil.addColumnOfOnesToMatrix(X).transpose().multiply(
+                        Delta[j].removeFirstColumn()));
+            } else {
+                Gradients[j] = Gradients[j].add(MatrixUtil.addColumnOfOnesToMatrix(A[j - 1].transpose().multiply(
+                        Delta[j].removeFirstColumn())));
             }
+        }
+    }
+
+    private void regularizeGradients() {
+        for (int j = Gradients.length - 1; j >= 0; --j) {
+            Matrix reg = Theta[j].multiply(lambda / m);
+            //putting column of zeros at the beginning, because we don't want to regularize biases
+            reg.getColumn(0).each((int i, double value) -> reg.set(i, 0, 0));
+            Gradients[j] = Gradients[j].multiply(1 / m).add(reg);
         }
     }
 
