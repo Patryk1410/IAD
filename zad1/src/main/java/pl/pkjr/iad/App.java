@@ -14,9 +14,11 @@ public class App
     private final String kExerciseOne = "Exercise 1: Approximation";
     private final String kExerciseTwo = "Exercise 2: Classification";
     private final String kExerciseThree = "Exercise 3: Transformation";
+    private final String kTest = "Test";
 
     private final int kFirstExerciseIndex = 1;
     private final int kNumberOfExercises = 3;
+    private final int kTestEnabled = 1;
 
     private Exercise exercise;
 
@@ -36,7 +38,7 @@ public class App
 
     private void selectExercise() {
         printExerciseSelection();
-        input = ConsoleController.getInt(kFirstExerciseIndex, kNumberOfExercises);
+        input = ConsoleController.getInt(kFirstExerciseIndex, kNumberOfExercises + kTestEnabled);
         exercise = ExerciseSelector.getInstance().getExercise(input);
     }
 
@@ -49,9 +51,12 @@ public class App
         ConsoleController.print(kExerciseOne);
         ConsoleController.print(kExerciseTwo);
         ConsoleController.print(kExerciseThree);
+        if (kTestEnabled == 1) {
+            ConsoleController.print(kTest);
+        }
     }
 
-    public void setShouldContinue(boolean shouldContinue) {
+    public static void setShouldContinue(boolean shouldContinue) {
         App.shouldContinue = shouldContinue;
     }
 

@@ -6,11 +6,16 @@ package pl.pkjr.iad.exercises;
 public enum  ExerciseEnum {
     firstExercise(1),
     secondExercise(2),
-    thirdExercise(3);
+    thirdExercise(3),
+    testExercise(4);
 
     private Integer value;
 
     ExerciseEnum(Integer value) {
         this.value = value;
+    }
+
+    public Integer getValue() {
+        return value;
     }
 }

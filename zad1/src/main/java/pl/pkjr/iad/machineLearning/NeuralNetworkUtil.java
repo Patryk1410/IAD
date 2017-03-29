@@ -5,6 +5,8 @@ import org.la4j.Vector;
 import org.la4j.matrix.dense.Basic2DMatrix;
 import org.la4j.vector.dense.BasicVector;
 
+import java.util.ArrayList;
+
 /**
  * Created by patry on 24/03/2017.
  */
@@ -24,6 +26,7 @@ public class NeuralNetworkUtil {
     public void initParameters() {
         network.n = network.X.columns();
         network.m = network.X.rows();
+        network.accuracyHistory = new ArrayList<>();
         randomlyInitTheta();
         initZ();
         initA();

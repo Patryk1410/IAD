@@ -1,5 +1,6 @@
 package pl.pkjr.iad.exercises;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +9,7 @@ import java.util.Map;
  */
 public class ExerciseSelector {
 
-    private Map<ExerciseEnum, Exercise> exercises;
+    private Map<Integer, Exercise> exercises;
 
     private static ExerciseSelector instance = null;
 
@@ -21,12 +22,13 @@ public class ExerciseSelector {
 
     private ExerciseSelector() {
         exercises = new HashMap<>();
-        exercises.put(ExerciseEnum.firstExercise, new Exercise1());
-        exercises.put(ExerciseEnum.secondExercise, new Exercise2());
-        exercises.put(ExerciseEnum.thirdExercise, new Exercise3());
+        exercises.put(ExerciseEnum.firstExercise.getValue(), new Exercise1());
+        exercises.put(ExerciseEnum.secondExercise.getValue(), new Exercise2());
+        exercises.put(ExerciseEnum.thirdExercise.getValue(), new Exercise3());
+        exercises.put(ExerciseEnum.testExercise.getValue(), new TestExercise());
     }
 
-    public Exercise getExercise(int exerciseNumber) {
+    public Exercise getExercise(Integer exerciseNumber) {
         return exercises.get(exerciseNumber);
     }
 }

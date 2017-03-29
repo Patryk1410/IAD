@@ -2,15 +2,20 @@ package pl.pkjr.iad.machineLearning;
 
 import org.la4j.Matrix;
 import org.la4j.Vector;
+import pl.pkjr.iad.console.ConsoleController;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunction;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionSelector;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
 import pl.pkjr.iad.utility.MatrixUtil;
 
+import java.util.List;
+
 /**
  * Created by patry on 08/03/2017.
  */
 public class NeuralNetwork {
+
+    private static final int kMaxAcuracy = 1;
 
     Matrix X; //training samples
     Matrix Y; //Expected values
@@ -29,6 +34,7 @@ public class NeuralNetwork {
     double epsilon; //range of theta initial values
     int maxEpochs;
     NeuralNetworkUtil util;
+    List<Double> accuracyHistory;
 
     public NeuralNetwork(Matrix x, Matrix y, int numberOfHiddenLayers, int[] numbersOfNeuronsInEachLayer,
                          double alpha, double lambda, double epsilon, int maxEpochs,
@@ -50,6 +56,10 @@ public class NeuralNetwork {
         for (int i = 0; i < maxEpochs; ++i) {
             predict();
             backpropagate();
+            accuracyHistory.add(computeAccuracy());
+            if (computeAccuracy() == kMaxAcuracy) {
+                break;
+            }
         }
     }
 
@@ -130,7 +140,31 @@ public class NeuralNetwork {
             Matrix reg = Theta[j].multiply(lambda / m);
             //putting column of zeros at the beginning, because we don't want to regularize biases
             reg.getColumn(0).each((int i, double value) -> reg.set(i, 0, 0));
-            Gradients[j] = Gradients[j].multiply(1 / m).add(reg);
+            Gradients[j] = Gradients[j].multiply(1.0 / m).add(reg);
+        }
+    }
+
+    private double computeAccuracy() {
+        //TODO: generalize
+        int wrongPredictions = 0;
+        int lastAIndex = 1;
+        for (int i = 0; i < m; ++i) {
+           if ((A[lastAIndex].get(i, 0) >= 0.5 && Y.get(i,0) == 0) ||
+                   (A[lastAIndex].get(i,0) < 0.5 && Y.get(i,0) == 1)) {
+               wrongPredictions++;
+           }
+        }
+        return 1 - (double)wrongPredictions / m;
+    }
+
+    private void printPrediction() {
+        int lastAIndex = 1;
+        for (int i  = 0; i < m; ++i) {
+            ConsoleController.print("Expected:");
+            ConsoleController.print((Y.getRow(i).toString()));
+            ConsoleController.print("Actual:");
+            ConsoleController.print(A[lastAIndex].getRow(i).toString());
+//            ConsoleController.print("\n");
         }
     }
 
@@ -157,5 +191,9 @@ public class NeuralNetwork {
 
     public void setEpsilon(double epsilon) {
         this.epsilon = epsilon;
+    }
+
+    public List<Double> getAccuracyHistory() {
+        return accuracyHistory;
     }
 }

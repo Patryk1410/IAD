@@ -4,6 +4,10 @@ import org.la4j.Matrix;
 import org.la4j.Vector;
 import org.la4j.matrix.dense.Basic2DMatrix;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 /**
  * Created by patry on 24/03/2017.
  */
@@ -82,5 +86,37 @@ public class MatrixUtil {
         Matrix newMatrix = M.copy();
         newMatrix.each((int i, int j, double value) -> newMatrix.set(i, j, value*value));
         return newMatrix;
+    }
+
+    public static Matrix readTestData(String filePath) {
+        int counter = 0;
+        try(FileReader fr = new FileReader(filePath);
+                FileReader fr2 = new FileReader(filePath);
+                BufferedReader br = new BufferedReader(fr);
+                BufferedReader br2 = new BufferedReader(fr2)) {
+            int N = (int) br2.lines().count();
+            double[][] dataset = new double[N][];
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] numbers = line.split(" ");
+                dataset[counter] = new double[numbers.length];
+                for (int i = 0; i < numbers.length; ++i) {
+                    dataset[counter][i] = Double.parseDouble(numbers[i]);
+                }
+                counter++;
+            }
+            return new Basic2DMatrix(dataset);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Matrix getX(Matrix Dataset) {
+        return Dataset.removeLastColumn();
+    }
+
+    public static Matrix getY(Matrix Dataset) {
+        return Dataset.removeFirstColumn().removeFirstColumn();
     }
 }
