@@ -5,6 +5,9 @@ import pl.pkjr.iad.console.ConsoleController;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunction;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionSelector;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
+import pl.pkjr.iad.machineLearning.outputFunction.OutputFunction;
+import pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionSelector;
+import pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType;
 import pl.pkjr.iad.utility.MatrixUtil;
 
 import java.util.List;
@@ -26,6 +29,7 @@ public class NeuralNetwork {
     Matrix[] Delta; //error of j-th neuron in i-th training example in k-th layer
     Matrix[] Gradients; //gradients used in Gradient Descent algorithm
     CostFunction costFunction;
+    OutputFunction outputFunction;
     int n; //number of features
     int m; //number of training examples
     int numberOfHiddenLayers;
@@ -40,7 +44,7 @@ public class NeuralNetwork {
 
     public NeuralNetwork(Matrix x, Matrix y, int numberOfHiddenLayers, int[] numbersOfNeuronsInEachLayer,
                          double alpha, double lambda, double epsilon, int maxEpochs,
-                         CostFunctionType costFunction) {
+                         CostFunctionType costFunction, OutputFunctionType outputFunction) {
         X = x;
         Y = y;
         this.numberOfHiddenLayers = numberOfHiddenLayers;
@@ -50,6 +54,7 @@ public class NeuralNetwork {
         this.epsilon = epsilon;
         this.maxEpochs = maxEpochs;
         this.costFunction = CostFunctionSelector.getCostFunction(costFunction);
+        this.outputFunction = OutputFunctionSelector.getOutputFunction(outputFunction);
         util = new NeuralNetworkUtil(this);
         util.initParameters();
     }
@@ -76,7 +81,7 @@ public class NeuralNetwork {
             Matrix CurrentTheta = Theta[i - 1]; //i - 1, because we need first theta matrix to predict values for
                                                 //second layer
             Z[i] = PreviousMatrix.multiply(CurrentTheta);
-            A[i - 1] = MatrixUtil.sigmoid(Z[i]);
+            A[i - 1] = i == Z.length - 1 ? outputFunction.activate(Z[i]) : MatrixUtil.sigmoid(Z[i]);
         }
     }
 
