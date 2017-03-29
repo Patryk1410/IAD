@@ -5,6 +5,8 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.la4j.Matrix;
 import org.la4j.Vector;
+import org.la4j.matrix.dense.Basic2DMatrix;
+import pl.pkjr.iad.machineLearning.NeuralNetwork;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,6 +90,53 @@ public class ChartsUtil {
         JFreeChart plot = createXYLineChart("Error", "Epochs", "Error", dataset);
         try {
             saveChartAsJPEG(new File("./plots/error.jpg"), plot, 600, 400);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void plotFunction(Matrix X, Matrix Y, String fileName) {
+        if (X.columns() > 1 || Y.columns() > 1) {
+            throw new IllegalArgumentException();
+        }
+        XYSeries points = new XYSeries("Initial function");
+        int m = X.rows();
+        for (int i = 0; i < m; ++i) {
+            points.add(X.get(i, 0), Y.get(i, 0));
+        }
+        XYSeriesCollection pointsCollection = new XYSeriesCollection();
+        pointsCollection.addSeries(points);
+        JFreeChart plot = createScatterPlot("Initial function", "x", "y", pointsCollection);
+        try {
+            saveChartAsJPEG(new File("./plots/" + fileName + ".jpg"), plot, 600, 400);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void plotFunctionAndApproximation(Matrix X, Matrix Y, NeuralNetwork network, String fileName) {
+        if (X.columns() > 1 || Y.columns() > 1) {
+            throw new IllegalArgumentException();
+        }
+        XYSeries points = new XYSeries("Initial function");
+        int m = X.rows();
+        for (int i = 0; i < m; ++i) {
+            points.add(X.get(i, 0), Y.get(i, 0));
+        }
+        XYSeries approximation = new XYSeries("Approximation");
+        double min = X.min(), max = X.max();
+        for (double i = min; i < max; i += 0.01) {
+            Matrix input = new Basic2DMatrix(1, 1);
+            input.set(0, 0, i);
+            approximation.add(i, network.predict(input).get(0, 0));
+        }
+        XYSeriesCollection pointsCollection = new XYSeriesCollection();
+        pointsCollection.addSeries(points);
+        pointsCollection.addSeries(approximation);
+        JFreeChart plot = createScatterPlot("Initial function and approximation",
+                "x", "y", pointsCollection);
+        try {
+            saveChartAsJPEG(new File("./plots/" + fileName + ".jpg"), plot, 600, 400);
         } catch (IOException e) {
             e.printStackTrace();
         }

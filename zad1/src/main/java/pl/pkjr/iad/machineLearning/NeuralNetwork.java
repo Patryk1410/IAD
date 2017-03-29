@@ -1,6 +1,7 @@
 package pl.pkjr.iad.machineLearning;
 
 import org.la4j.Matrix;
+import org.la4j.Vector;
 import pl.pkjr.iad.console.ConsoleController;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunction;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionSelector;
@@ -12,6 +13,8 @@ import pl.pkjr.iad.utility.MatrixUtil;
 
 import java.util.List;
 
+import static pl.pkjr.iad.utility.MatrixUtil.addColumnOfOnesToMatrix;
+import static pl.pkjr.iad.utility.MatrixUtil.sigmoid;
 import static pl.pkjr.iad.utility.VectorUtil.getIndexOfMaxElement;
 
 /**
@@ -61,7 +64,7 @@ public class NeuralNetwork {
 
     public void fit() {
         for (int i = 0; i < maxEpochs; ++i) {
-            predict();
+            forwardPropagate();
             backpropagate();
             accuracyHistory.add(computeAccuracy());
             errorHistory.add(J());
@@ -71,18 +74,33 @@ public class NeuralNetwork {
         }
     }
 
-    public void predict() {
-        //Starting from i=1, because we don't need to predict values from input layer
+    private void forwardPropagate() {
+        //Starting from i=1, because we don't need to forwardPropagate values from input layer
         for (int i = 1; i < Z.length; ++i) {
             Matrix PreviousMatrix =
                     i == 1 ?
                     MatrixUtil.addColumnOfOnesToMatrix(X) :
                     MatrixUtil.addColumnOfOnesToMatrix(A[i - 2]);
-            Matrix CurrentTheta = Theta[i - 1]; //i - 1, because we need first theta matrix to predict values for
+            Matrix CurrentTheta = Theta[i - 1]; //i - 1, because we need first theta matrix to forwardPropagate values for
                                                 //second layer
             Z[i] = PreviousMatrix.multiply(CurrentTheta);
-            A[i - 1] = i == Z.length - 1 ? outputFunction.activate(Z[i]) : MatrixUtil.sigmoid(Z[i]);
+            A[i - 1] = (i == (Z.length - 1)) ? outputFunction.activate(Z[i]) : sigmoid(Z[i]);
         }
+    }
+
+    public Matrix predict(Matrix input) {
+        Matrix res = MatrixUtil.addColumnOfOnesToMatrix(input);
+        for (int i = 1; i < Z.length; ++i) {
+            Matrix CurrentTheta = Theta[i - 1];
+            res = res.multiply(CurrentTheta);
+            if (i == Z.length - 1) {
+                res = outputFunction.activate(res);
+            } else {
+                res = sigmoid(res);
+                res = addColumnOfOnesToMatrix(res);
+            }
+        }
+        return res;
     }
 
     public double J() {

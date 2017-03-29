@@ -7,10 +7,12 @@ import pl.pkjr.iad.console.ConsoleController;
 import pl.pkjr.iad.data.DatasetsManager;
 import pl.pkjr.iad.machineLearning.NeuralNetwork;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
+import pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType;
 import pl.pkjr.iad.utility.ChartsUtil;
 import pl.pkjr.iad.utility.MatrixUtil;
 
 import static pl.pkjr.iad.machineLearning.costFunction.CostFunctionType.logarithmic;
+import static pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType.sigmoid;
 
 /**
  * Created by patry on 28/03/2017.
@@ -54,7 +56,7 @@ public class TestExercise implements Exercise {
     private void trainNetwork() {
         int[] neurons = {2, 2, 2, 1};
         NeuralNetwork network = new NeuralNetwork(X, Y, 2, neurons, alpha, 0, 0.5,
-                numberOfEpochs, logarithmic);
+                numberOfEpochs, logarithmic, sigmoid);
         network.fit();
         ChartsUtil.plotAccuracy(network.getAccuracyHistory());
     }

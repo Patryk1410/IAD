@@ -5,6 +5,7 @@ package pl.pkjr.iad.exercises;
  */
 public class Exercise2 implements Exercise {
 
+
     @Override
     public void run() {
 

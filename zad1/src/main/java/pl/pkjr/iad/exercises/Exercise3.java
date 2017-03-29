@@ -5,12 +5,14 @@ import pl.pkjr.iad.App;
 import pl.pkjr.iad.console.ConsoleController;
 import pl.pkjr.iad.machineLearning.NeuralNetwork;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
+import pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType;
 import pl.pkjr.iad.utility.ChartsUtil;
 import pl.pkjr.iad.utility.MatrixUtil;
 
 import static pl.pkjr.iad.console.ConsoleController.*;
 import static pl.pkjr.iad.machineLearning.costFunction.CostFunctionType.logarithmic;
 import static pl.pkjr.iad.machineLearning.costFunction.CostFunctionType.quadratic;
+import static pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType.sigmoid;
 import static pl.pkjr.iad.utility.ChartsUtil.plotAccuracy;
 import static pl.pkjr.iad.utility.ChartsUtil.plotError;
 import static pl.pkjr.iad.utility.MatrixUtil.readTestData;
@@ -36,7 +38,6 @@ public class Exercise3 implements Exercise {
     private static final double kLambda = 0.25;
     private static final double kEpsilon = 0.5;
 
-
     private Matrix X;
     private Matrix Y;
 
@@ -61,7 +62,7 @@ public class Exercise3 implements Exercise {
     private void trainNetwork() {
         int neurons[] = {4, numberOfNeuronsInHiddenLayer, 4};
         NeuralNetwork network = new NeuralNetwork(X, Y, kNumberOfHiddenLayers, neurons, alpha, kLambda,
-                kEpsilon, maxEpochs, quadratic);
+                kEpsilon, maxEpochs, quadratic, sigmoid);
         network.fit();
         plotAccuracy(network.getAccuracyHistory());
         plotError(network.getErrorHistory());

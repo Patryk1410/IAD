@@ -10,6 +10,8 @@ import pl.pkjr.iad.machineLearning.costFunction.CostFunction;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionSelector;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
 
+import static pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType.sigmoid;
+
 /**
  * Created by patry on 24/03/2017.
  */
@@ -25,12 +27,7 @@ public class NeuralNetworkTest {
         Matrix Y = new Basic2DMatrix(dataY);
         int[] neurons = {3, 2, 1};
         network = new NeuralNetwork(X, Y, 1, neurons, 0.1, 1, 1, 100,
-                CostFunctionType.logarithmic);
-    }
-
-    @Test
-    public void testPredict() {
-        network.predict();
+                CostFunctionType.logarithmic, sigmoid);
     }
 
     @Test
