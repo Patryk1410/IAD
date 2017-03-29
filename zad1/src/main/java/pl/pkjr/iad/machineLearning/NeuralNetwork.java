@@ -68,9 +68,6 @@ public class NeuralNetwork {
             backpropagate();
             accuracyHistory.add(computeAccuracy());
             errorHistory.add(J());
-//            if (computeAccuracy() == kMaxAccuracy) {
-//                break;
-//            }
         }
     }
 
@@ -205,17 +202,6 @@ public class NeuralNetwork {
     private boolean hasOneOutputNeuron() {
         int outputLayerIndex = numberOfHiddenLayers + 1;
         return numbersOfNeuronsInEachLayer[outputLayerIndex] == 1;
-    }
-
-    private void printPrediction() {
-        int lastAIndex = 1;
-        for (int i  = 0; i < m; ++i) {
-            ConsoleController.print("Expected:");
-            ConsoleController.print((Y.getRow(i).toString()));
-            ConsoleController.print("Actual:");
-            ConsoleController.print(A[lastAIndex].getRow(i).toString());
-//            ConsoleController.print("\n");
-        }
     }
 
     //////////////Getters and setters//////////////

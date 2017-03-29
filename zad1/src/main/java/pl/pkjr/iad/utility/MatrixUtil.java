@@ -119,4 +119,12 @@ public class MatrixUtil {
     public static Matrix getY(Matrix Dataset) {
         return Dataset.removeFirstColumn().removeFirstColumn();
     }
+
+    public static Matrix prepareY(Matrix Y, int n) {
+        Matrix newY = new Basic2DMatrix(Y.rows(), n);
+        Y.each((int i, int j, double value) -> {
+            newY.set(i, (int)value - 1, 1);
+        });
+        return newY;
+    }
 }

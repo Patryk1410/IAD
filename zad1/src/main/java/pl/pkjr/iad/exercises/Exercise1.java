@@ -20,9 +20,9 @@ import static pl.pkjr.iad.utility.MatrixUtil.readTestData;
  */
 public class Exercise1 implements Exercise {
 
-    private static final String kDataset1Path = "./datasets/ex2/dataset2_1.txt";
-    private static final String kDataset2Path = "./datasets/ex2/dataset2_2.txt";
-    private static final String kTestsetPath = "./datasets/ex2/testset2.txt";
+    private static final String kDataset1Path = "./datasets/ex1/dataset2_1.txt";
+    private static final String kDataset2Path = "./datasets/ex1/dataset2_2.txt";
+    private static final String kTestsetPath = "./datasets/ex1/testset2.txt";
     private static final String kChooseNumberOfNeuronsInHiddenLayer = "Choose number of neurons in hidden layer";
     private static final String kChooseAlpha = "Choose alpha";
     private static final String kChooseMaxEpochs = "Choose max number of epochs";
@@ -92,6 +92,8 @@ public class Exercise1 implements Exercise {
         plotError(network.getErrorHistory());
         plotFunction(X, Y, "function");
         plotFunctionAndApproximation(X, Y, network, "approximation");
+        plotFunction(X_test, Y_test, "testFunction");
+        plotFunctionAndApproximation(X_test, Y_test, network, "testApproximation");
     }
 
     private void finish() {
