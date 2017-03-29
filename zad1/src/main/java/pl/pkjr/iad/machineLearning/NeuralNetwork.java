@@ -1,7 +1,6 @@
 package pl.pkjr.iad.machineLearning;
 
 import org.la4j.Matrix;
-import org.la4j.Vector;
 import pl.pkjr.iad.console.ConsoleController;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunction;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionSelector;
@@ -10,12 +9,14 @@ import pl.pkjr.iad.utility.MatrixUtil;
 
 import java.util.List;
 
+import static pl.pkjr.iad.utility.VectorUtil.getIndexOfMaxElement;
+
 /**
  * Created by patry on 08/03/2017.
  */
 public class NeuralNetwork {
 
-    private static final int kMaxAcuracy = 1;
+    private static final int kMaxAccuracy = 1;
 
     Matrix X; //training samples
     Matrix Y; //Expected values
@@ -35,6 +36,7 @@ public class NeuralNetwork {
     int maxEpochs;
     NeuralNetworkUtil util;
     List<Double> accuracyHistory;
+    List<Double> errorHistory;
 
     public NeuralNetwork(Matrix x, Matrix y, int numberOfHiddenLayers, int[] numbersOfNeuronsInEachLayer,
                          double alpha, double lambda, double epsilon, int maxEpochs,
@@ -57,9 +59,10 @@ public class NeuralNetwork {
             predict();
             backpropagate();
             accuracyHistory.add(computeAccuracy());
-            if (computeAccuracy() == kMaxAcuracy) {
-                break;
-            }
+            errorHistory.add(J());
+//            if (computeAccuracy() == kMaxAccuracy) {
+//                break;
+//            }
         }
     }
 
@@ -129,8 +132,8 @@ public class NeuralNetwork {
                 Gradients[j] = Gradients[j].add(MatrixUtil.addColumnOfOnesToMatrix(X).transpose().multiply(
                         Delta[j].removeFirstColumn()));
             } else {
-                Gradients[j] = Gradients[j].add(MatrixUtil.addColumnOfOnesToMatrix(A[j - 1].transpose().multiply(
-                        Delta[j].removeFirstColumn())));
+                Gradients[j] = Gradients[j].add(MatrixUtil.addColumnOfOnesToMatrix(A[j - 1]).transpose().multiply(
+                        Delta[j].removeFirstColumn()));
             }
         }
     }
@@ -145,16 +148,40 @@ public class NeuralNetwork {
     }
 
     private double computeAccuracy() {
-        //TODO: generalize
-        int wrongPredictions = 0;
-        int lastAIndex = 1;
-        for (int i = 0; i < m; ++i) {
-           if ((A[lastAIndex].get(i, 0) >= 0.5 && Y.get(i,0) == 0) ||
-                   (A[lastAIndex].get(i,0) < 0.5 && Y.get(i,0) == 1)) {
-               wrongPredictions++;
-           }
+        if (hasOneOutputNeuron()) {
+            return computeAccuracyForOneOutputNeuron();
+        } else {
+            return computeAccuracyForMultipleOutputNeurons();
         }
-        return 1 - (double)wrongPredictions / m;
+    }
+
+    private double computeAccuracyForOneOutputNeuron() {
+        int correctPredictions = 0;
+        int lastAIndex = numberOfHiddenLayers;
+        for (int i = 0; i < m; ++i) {
+            if (Math.round(A[lastAIndex].get(i, 0)) ==  Y.get(i,0)) {
+                correctPredictions++;
+            }
+        }
+        return (double)correctPredictions / m;
+    }
+
+    private double computeAccuracyForMultipleOutputNeurons() {
+        int correctPredictions = 0;
+        int lastAIndex = numberOfHiddenLayers;
+        for (int i = 0; i < m; ++i) {
+            int expected = getIndexOfMaxElement(Y.getRow(i));
+            int actual = getIndexOfMaxElement(A[lastAIndex].getRow(i));
+            if (expected == actual) {
+                correctPredictions++;
+            }
+        }
+        return (double)correctPredictions / m;
+    }
+
+    private boolean hasOneOutputNeuron() {
+        int outputLayerIndex = numberOfHiddenLayers + 1;
+        return numbersOfNeuronsInEachLayer[outputLayerIndex] == 1;
     }
 
     private void printPrediction() {
@@ -195,5 +222,9 @@ public class NeuralNetwork {
 
     public List<Double> getAccuracyHistory() {
         return accuracyHistory;
+    }
+
+    public List<Double> getErrorHistory() {
+        return errorHistory;
     }
 }

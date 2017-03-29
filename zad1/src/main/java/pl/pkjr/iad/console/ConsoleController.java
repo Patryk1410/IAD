@@ -36,9 +36,9 @@ public class ConsoleController {
         return scanner.nextDouble();
     }
 
-    public static double getDouble(int a, int b) {
+    public static double getDouble(double a, double b) {
         if (a > b) {
-            int temp = a;
+            double temp = a;
             a = b;
             b = temp;
         }
@@ -48,5 +48,10 @@ public class ConsoleController {
             res = getDouble();
         }
         return res;
+    }
+
+    public static char getChar() {
+        Scanner scanner = new Scanner(System.in);
+        return scanner.next().charAt(0);
     }
 }

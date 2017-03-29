@@ -52,8 +52,8 @@ public class TestExercise implements Exercise {
     }
 
     private void trainNetwork() {
-        int[] neurons = {2, 2, 1};
-        NeuralNetwork network = new NeuralNetwork(X, Y, 1, neurons, alpha, 0, 0.5,
+        int[] neurons = {2, 2, 2, 1};
+        NeuralNetwork network = new NeuralNetwork(X, Y, 2, neurons, alpha, 0, 0.5,
                 numberOfEpochs, logarithmic);
         network.fit();
         ChartsUtil.plotAccuracy(network.getAccuracyHistory());

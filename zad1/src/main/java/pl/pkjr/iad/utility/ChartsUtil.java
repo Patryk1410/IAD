@@ -1,7 +1,5 @@
 package pl.pkjr.iad.utility;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -12,15 +10,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import static org.jfree.chart.ChartFactory.createScatterPlot;
+import static org.jfree.chart.ChartFactory.createXYLineChart;
+import static org.jfree.chart.ChartUtilities.saveChartAsJPEG;
+
 /**
  * Created by patry on 28/03/2017.
  */
 public class ChartsUtil {
     public static void plotScatter(Matrix X, Vector y) {
         XYSeriesCollection points = getPoints(X, y);
-        JFreeChart scatterPlot = ChartFactory.createScatterPlot("Points", "x1", "x2", points);
+        JFreeChart scatterPlot = createScatterPlot("Points", "x1", "x2", points);
         try {
-            ChartUtilities.saveChartAsJPEG(new File("./plots/plot1.jpg"), scatterPlot, 600, 400);
+            saveChartAsJPEG(new File("./plots/plot1.jpg"), scatterPlot, 600, 400);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -36,9 +38,9 @@ public class ChartsUtil {
             predictionLine.add(x1, x2);
         }
         points.addSeries(predictionLine);
-        JFreeChart plot = ChartFactory.createScatterPlot("Prediction", "x1", "x2", points);
+        JFreeChart plot = createScatterPlot("Prediction", "x1", "x2", points);
         try {
-            ChartUtilities.saveChartAsJPEG(new File("./plots/plotPrediction" + Integer.toString(index) + ".jpg"), plot, 600, 400);
+            saveChartAsJPEG(new File("./plots/plotPrediction" + Integer.toString(index) + ".jpg"), plot, 600, 400);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -68,9 +70,24 @@ public class ChartsUtil {
         }
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(series);
-        JFreeChart plot = ChartFactory.createXYLineChart("Accuracy", "Epochs", "Accuracy", dataset);
+        JFreeChart plot = createXYLineChart("Accuracy", "Epochs", "Accuracy", dataset);
         try {
-            ChartUtilities.saveChartAsJPEG(new File("./plots/accuracy.jpg"), plot, 600, 400);
+            saveChartAsJPEG(new File("./plots/accuracy.jpg"), plot, 600, 400);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void plotError(List<Double> accuracy) {
+        XYSeries series = new XYSeries("graph");
+        for (int i = 0; i < accuracy.size(); ++i) {
+            series.add(i, accuracy.get(i));
+        }
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        dataset.addSeries(series);
+        JFreeChart plot = createXYLineChart("Error", "Epochs", "Error", dataset);
+        try {
+            saveChartAsJPEG(new File("./plots/error.jpg"), plot, 600, 400);
         } catch (IOException e) {
             e.printStackTrace();
         }

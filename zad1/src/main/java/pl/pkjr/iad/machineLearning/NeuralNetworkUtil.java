@@ -27,6 +27,7 @@ public class NeuralNetworkUtil {
         network.n = network.X.columns();
         network.m = network.X.rows();
         network.accuracyHistory = new ArrayList<>();
+        network.errorHistory = new ArrayList<>();
         randomlyInitTheta();
         initZ();
         initA();
