@@ -1,31 +1,28 @@
-package pl.pkjr.iad.machineLearning;
+package pl.pkjr.iad.machineLearning.neuralNetworks;
 
 import org.la4j.Matrix;
-import org.la4j.Vector;
-import pl.pkjr.iad.console.ConsoleController;
+import pl.pkjr.iad.machineLearning.MachineLearningAlgorithm;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunction;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionSelector;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
 import pl.pkjr.iad.machineLearning.outputFunction.OutputFunction;
 import pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionSelector;
 import pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType;
-import pl.pkjr.iad.utility.MatrixUtil;
 
 import java.util.List;
 
-import static pl.pkjr.iad.utility.MatrixUtil.addColumnOfOnesToMatrix;
-import static pl.pkjr.iad.utility.MatrixUtil.sigmoid;
 import static pl.pkjr.iad.utility.VectorUtil.getIndexOfMaxElement;
 
 /**
  * Created by patry on 08/03/2017.
  */
-public class NeuralNetwork {
+public abstract class NeuralNetwork {
 
     private static final int kMaxAccuracy = 1;
 
     Matrix X; //training samples
     Matrix Y; //Expected values
+    Matrix[] PreviousTheta; //used to compute momentum
     Matrix[] Theta; //weights of connection between each pair of connected neurons
     Matrix[] Z; //input of j-th neuron in i-th training example in k-th layer
     Matrix[] A; //output of j-th neuron in i-th training example in k-th layer
@@ -58,8 +55,6 @@ public class NeuralNetwork {
         this.maxEpochs = maxEpochs;
         this.costFunction = CostFunctionSelector.getCostFunction(costFunction);
         this.outputFunction = OutputFunctionSelector.getOutputFunction(outputFunction);
-        util = new NeuralNetworkUtil(this);
-        util.initParameters();
     }
 
     public void fit() {
@@ -71,36 +66,11 @@ public class NeuralNetwork {
         }
     }
 
-    private void forwardPropagate() {
-        //Starting from i=1, because we don't need to forwardPropagate values from input layer
-        for (int i = 1; i < Z.length; ++i) {
-            Matrix PreviousMatrix =
-                    i == 1 ?
-                    MatrixUtil.addColumnOfOnesToMatrix(X) :
-                    MatrixUtil.addColumnOfOnesToMatrix(A[i - 2]);
-            Matrix CurrentTheta = Theta[i - 1]; //i - 1, because we need first theta matrix to forwardPropagate values for
-                                                //second layer
-            Z[i] = PreviousMatrix.multiply(CurrentTheta);
-            A[i - 1] = (i == (Z.length - 1)) ? outputFunction.activate(Z[i]) : sigmoid(Z[i]);
-        }
-    }
+    protected abstract void forwardPropagate();
 
-    public Matrix predict(Matrix input) {
-        Matrix res = MatrixUtil.addColumnOfOnesToMatrix(input);
-        for (int i = 1; i < Z.length; ++i) {
-            Matrix CurrentTheta = Theta[i - 1];
-            res = res.multiply(CurrentTheta);
-            if (i == Z.length - 1) {
-                res = outputFunction.activate(res);
-            } else {
-                res = sigmoid(res);
-                res = addColumnOfOnesToMatrix(res);
-            }
-        }
-        return res;
-    }
+    public abstract Matrix predict(Matrix input);
 
-    public double J() {
+    private double J() {
         return costFunction.calculateCost(Theta, m, Y, A[A.length - 1], lambda);
     }
 
@@ -108,7 +78,7 @@ public class NeuralNetwork {
         computeErrors();
         computeGradients();
         regularizeGradients();
-        MachineLearningAlgorithm.gradientDescent(Theta, Gradients, alpha);
+        MachineLearningAlgorithm.gradientDescent(Theta, PreviousTheta, Gradients, alpha);
     }
 
     private void computeErrors() {
@@ -128,44 +98,13 @@ public class NeuralNetwork {
         Delta[indexOfOutputLayer] = A[indexOfOutputLayer].subtract(Y);
     }
 
-    private void computeErrorsForLastHiddenLayer() {
-        int indexOfOutputLayer = numberOfHiddenLayers;
-        int indexOfLastHiddenLayer = numberOfHiddenLayers - 1;
-        //TODO: split into separate lines so it's easier to debug
-        Delta[indexOfLastHiddenLayer] = MatrixUtil.elementwiseMultiply(
-                Delta[indexOfOutputLayer].multiply(Theta[indexOfOutputLayer].transpose()),
-                MatrixUtil.sigmoidDerivative(MatrixUtil.addColumnOfOnesToMatrix(Z[indexOfOutputLayer])));
-    }
+    protected abstract void computeErrorsForLastHiddenLayer();
 
-    private void computeErrorsForHiddenLayer(int index) {
-        //TODO: split into separate lines so it's easier to debug
-        Delta[index] = MatrixUtil.elementwiseMultiply(
-                Delta[index + 1].removeFirstColumn().multiply(Theta[index + 1].transpose()),
-                MatrixUtil.sigmoidDerivative(MatrixUtil.addColumnOfOnesToMatrix(Z[index + 1])));
-    }
+    protected abstract void computeErrorsForHiddenLayer(int index);
 
-    private void computeGradients() {
-        for (int j = Gradients.length - 1; j >= 0; --j) {
-            if (j == Gradients.length - 1) {
-                Gradients[j] = Gradients[j].add(MatrixUtil.addColumnOfOnesToMatrix(A[j - 1]).transpose().multiply(Delta[j]));
-            } else if (j == 0) {
-                Gradients[j] = Gradients[j].add(MatrixUtil.addColumnOfOnesToMatrix(X).transpose().multiply(
-                        Delta[j].removeFirstColumn()));
-            } else {
-                Gradients[j] = Gradients[j].add(MatrixUtil.addColumnOfOnesToMatrix(A[j - 1]).transpose().multiply(
-                        Delta[j].removeFirstColumn()));
-            }
-        }
-    }
+    protected abstract void computeGradients();
 
-    private void regularizeGradients() {
-        for (int j = Gradients.length - 1; j >= 0; --j) {
-            Matrix reg = Theta[j].multiply(lambda / m);
-            //putting column of zeros at the beginning, because we don't want to regularize biases
-            reg.getColumn(0).each((int i, double value) -> reg.set(i, 0, 0));
-            Gradients[j] = Gradients[j].multiply(1.0 / m).add(reg);
-        }
-    }
+    protected abstract void regularizeGradients();
 
     private double computeAccuracy() {
         if (hasOneOutputNeuron()) {

@@ -6,7 +6,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.la4j.Matrix;
 import org.la4j.Vector;
 import org.la4j.matrix.dense.Basic2DMatrix;
-import pl.pkjr.iad.machineLearning.NeuralNetwork;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetwork;
 
 import java.io.File;
 import java.io.IOException;

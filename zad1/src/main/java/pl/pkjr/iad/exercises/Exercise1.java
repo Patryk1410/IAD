@@ -2,7 +2,8 @@ package pl.pkjr.iad.exercises;
 
 import org.la4j.Matrix;
 import pl.pkjr.iad.App;
-import pl.pkjr.iad.machineLearning.NeuralNetwork;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetwork;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetworkWithBias;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,6 +74,7 @@ public class Exercise1 implements Exercise {
         Y_test = Testset.getColumn(kYColumnNumber).toColumnMatrix();
     }
 
+    @SuppressWarnings("Duplicates")
     private void prepareParameters() {
         print(kChooseDataset);
         choosenDataset = getInt(kMinDatasetNumber, kMaxDatasetNumber);
@@ -86,7 +88,7 @@ public class Exercise1 implements Exercise {
 
     private void trainNetwork() {
         int neurons[] = {1, numberOfNeuronsInHiddenLayer, 1};
-        NeuralNetwork network = new NeuralNetwork(X, Y, kNumberOfHiddenLayers, neurons, alpha, kLambda,
+        NeuralNetwork network = new NeuralNetworkWithBias(X, Y, kNumberOfHiddenLayers, neurons, alpha, kLambda,
                 kEpsilon, maxEpochs, quadratic, linear);
         network.fit();
         plotError(network.getErrorHistory());

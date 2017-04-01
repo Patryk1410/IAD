@@ -2,8 +2,8 @@ package pl.pkjr.iad.exercises;
 
 import org.la4j.Matrix;
 import pl.pkjr.iad.App;
-import pl.pkjr.iad.machineLearning.NeuralNetwork;
-import pl.pkjr.iad.utility.MatrixUtil;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetwork;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetworkWithBias;
 
 import static pl.pkjr.iad.console.ConsoleController.*;
 import static pl.pkjr.iad.machineLearning.costFunction.CostFunctionType.quadratic;
@@ -34,7 +34,7 @@ public class Exercise2 implements Exercise {
     private static final int kMinMaxEpochs = 1;
     private static final int kMaxMaxEpochs = 1000000;
     private static final int kNumberOfHiddenLayers = 1;
-    private static final double kLambda = 0.25;
+    private static final double kLambda = 0.1;
     private static final double kEpsilon = 0.5;
     private static final int kXColumnNumber = 0;
     private static final int kYColumnNumber = 4;
@@ -77,7 +77,7 @@ public class Exercise2 implements Exercise {
 
     private void trainNetwork() {
         int neurons[] = {numberOfNeuronsInInputLayer, numberOfNeuronsInHiddenLayer, 3};
-        NeuralNetwork network = new NeuralNetwork(X, Y, kNumberOfHiddenLayers, neurons, alpha, kLambda,
+        NeuralNetwork network = new NeuralNetworkWithBias(X, Y, kNumberOfHiddenLayers, neurons, alpha, kLambda,
                 kEpsilon, maxEpochs, quadratic, sigmoid);
         network.fit();
         plotError(network.getErrorHistory());

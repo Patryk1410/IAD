@@ -5,10 +5,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.la4j.Matrix;
 import org.la4j.matrix.dense.Basic2DMatrix;
-import pl.pkjr.iad.machineLearning.NeuralNetwork;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetwork;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunction;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionSelector;
 import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetworkWithBias;
 
 import static pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType.sigmoid;
 
@@ -26,8 +27,9 @@ public class NeuralNetworkTest {
         Matrix X = new Basic2DMatrix(dataX);
         Matrix Y = new Basic2DMatrix(dataY);
         int[] neurons = {3, 2, 1};
-        network = new NeuralNetwork(X, Y, 1, neurons, 0.1, 1, 1, 100,
-                CostFunctionType.logarithmic, sigmoid);
+        network = new NeuralNetworkWithBias(X, Y, 1, neurons, 0.1, 1, 1, 100,
+                CostFunctionType.logarithmic, sigmoid) {
+        };
     }
 
     @Test

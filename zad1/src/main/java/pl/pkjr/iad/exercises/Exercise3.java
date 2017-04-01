@@ -2,15 +2,11 @@ package pl.pkjr.iad.exercises;
 
 import org.la4j.Matrix;
 import pl.pkjr.iad.App;
-import pl.pkjr.iad.console.ConsoleController;
-import pl.pkjr.iad.machineLearning.NeuralNetwork;
-import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
-import pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType;
-import pl.pkjr.iad.utility.ChartsUtil;
-import pl.pkjr.iad.utility.MatrixUtil;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetwork;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetworkWithBias;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetworkWithoutBias;
 
 import static pl.pkjr.iad.console.ConsoleController.*;
-import static pl.pkjr.iad.machineLearning.costFunction.CostFunctionType.logarithmic;
 import static pl.pkjr.iad.machineLearning.costFunction.CostFunctionType.quadratic;
 import static pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType.sigmoid;
 import static pl.pkjr.iad.utility.ChartsUtil.plotAccuracy;
@@ -29,13 +25,13 @@ public class Exercise3 implements Exercise {
     private static final String kContinue = "Continue?(y/n)";
 
     private static final int kMinNeuronsInHiddenLayer = 1;
-    private static final int kMaxNeuronsInHiddenLayer = 3;
+    private static final int kMaxNeuronsInHiddenLayer = 4;
     private static final double kMinAlpha = 0.0;
     private static final double kMaxAlpha = 1.0;
     private static final int kMinMaxEpochs = 1;
     private static final int kMaxMaxEpochs = 100000;
     private static final int kNumberOfHiddenLayers = 1;
-    private static final double kLambda = 0.25;
+    private static final double kLambda = 0.0;
     private static final double kEpsilon = 0.5;
 
     private Matrix X;
@@ -61,7 +57,7 @@ public class Exercise3 implements Exercise {
 
     private void trainNetwork() {
         int neurons[] = {4, numberOfNeuronsInHiddenLayer, 4};
-        NeuralNetwork network = new NeuralNetwork(X, Y, kNumberOfHiddenLayers, neurons, alpha, kLambda,
+        NeuralNetwork network = new NeuralNetworkWithoutBias(X, Y, kNumberOfHiddenLayers, neurons, alpha, kLambda,
                 kEpsilon, maxEpochs, quadratic, sigmoid);
         network.fit();
         plotAccuracy(network.getAccuracyHistory());

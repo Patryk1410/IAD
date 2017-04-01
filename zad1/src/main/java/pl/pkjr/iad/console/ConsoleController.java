@@ -6,7 +6,7 @@ import java.util.Scanner;
  * Created by patry on 06/03/2017.
  */
 public class ConsoleController {
-    private static final String kWrongValue = "You must choose value from range [%i, %i] \n";
+    private static final String kWrongValue = "You must choose value from range [%d, %d] \n";
 
     public static void print(String text) {
         System.out.println(text);

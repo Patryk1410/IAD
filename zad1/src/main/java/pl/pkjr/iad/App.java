@@ -18,7 +18,7 @@ public class App
 
     private final int kFirstExerciseIndex = 1;
     private final int kNumberOfExercises = 3;
-    private final int kTestEnabled = 1;
+    private final int kTestEnabled = 0;
 
     private Exercise exercise;
 

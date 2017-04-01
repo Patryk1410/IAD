@@ -1,13 +1,11 @@
 package pl.pkjr.iad.exercises;
 
 import org.la4j.Matrix;
-import org.la4j.Vector;
 import pl.pkjr.iad.App;
 import pl.pkjr.iad.console.ConsoleController;
 import pl.pkjr.iad.data.DatasetsManager;
-import pl.pkjr.iad.machineLearning.NeuralNetwork;
-import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
-import pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetwork;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetworkWithBias;
 import pl.pkjr.iad.utility.ChartsUtil;
 import pl.pkjr.iad.utility.MatrixUtil;
 
@@ -55,7 +53,7 @@ public class TestExercise implements Exercise {
 
     private void trainNetwork() {
         int[] neurons = {2, 2, 2, 1};
-        NeuralNetwork network = new NeuralNetwork(X, Y, 2, neurons, alpha, 0, 0.5,
+        NeuralNetwork network = new NeuralNetworkWithBias(X, Y, 2, neurons, alpha, 0, 0.5,
                 numberOfEpochs, logarithmic, sigmoid);
         network.fit();
         ChartsUtil.plotAccuracy(network.getAccuracyHistory());

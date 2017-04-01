@@ -1,9 +1,8 @@
-package pl.pkjr.iad.machineLearning;
+package pl.pkjr.iad.machineLearning.neuralNetworks;
 
 import org.la4j.Matrix;
-import org.la4j.Vector;
 import org.la4j.matrix.dense.Basic2DMatrix;
-import org.la4j.vector.dense.BasicVector;
+import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetwork;
 
 import java.util.ArrayList;
 
@@ -14,13 +13,13 @@ public class NeuralNetworkUtil {
 
     private final static int NUMBER_OF_INPUT_LAYERS = 1;
     private final static int NUMBER_OF_OUTPUT_LAYERS = 1;
-    private final static int BIAS = 1;
-    private final static int NO_BIAS = 0;
 
     private NeuralNetwork network;
+    private int bias;
 
-    public NeuralNetworkUtil(NeuralNetwork network) {
+    public NeuralNetworkUtil(NeuralNetwork network, int bias) {
         this.network = network;
+        this.bias = bias;
     }
 
     public void initParameters() {
@@ -29,6 +28,7 @@ public class NeuralNetworkUtil {
         network.accuracyHistory = new ArrayList<>();
         network.errorHistory = new ArrayList<>();
         randomlyInitTheta();
+        initPreviousTheta();
         initZ();
         initA();
         initDelta();
@@ -50,40 +50,30 @@ public class NeuralNetworkUtil {
     private void initTheta() {
         network.Theta = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
         for (int i = 0; i < network.Theta.length; ++i) {
-            int rows = network.numbersOfNeuronsInEachLayer[i] + BIAS;
+            int rows = network.numbersOfNeuronsInEachLayer[i] + bias;
             int columns = network.numbersOfNeuronsInEachLayer[i + 1];
             network.Theta[i] = new Basic2DMatrix(rows, columns);
         }
     }
 
+    private void initPreviousTheta() {
+        network.PreviousTheta = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
+        for (int i = 0; i < network.PreviousTheta.length; ++i) {
+            network.PreviousTheta[i] = Matrix.zero(network.Theta[i].rows(), network.Theta[i].columns());
+        }
+    }
+
     private void initZ() {
         network.Z = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_INPUT_LAYERS + NUMBER_OF_OUTPUT_LAYERS];
-//        int rows = network.m;
-//        for (int i = 0; i < network.Z.length; ++i) {
-//            int columns = network.numbersOfNeuronsInEachLayer[i];
-//            network.Z[i] = new Basic2DMatrix(rows, columns);
-//        }
         network.Z[0] = network.X.copy();
     }
 
     private void initA() {
         network.A = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
-//        int rows = network.m;
-//        for (int i = 0; i < network.A.length; ++i) {
-//            int columns = network.numbersOfNeuronsInEachLayer[i + 1];//i + 1 because we don't use activation function
-//                                                                     //on input layer to get output
-//            network.A[i] = new Basic2DMatrix(rows, columns);
-//        }
     }
 
     private void initDelta() {
         network.Delta = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
-//        int rows = network.m;
-//        for (int i = 0; i < network.Delta.length; ++i) {
-//            int columns = network.numbersOfNeuronsInEachLayer[i + 1]; //i + 1 because we don't calculate error for
-//                                                                      //input layer
-//            network.Delta[i] = new Basic2DMatrix(rows, columns);
-//        }
     }
 
     private void initGradients() {
