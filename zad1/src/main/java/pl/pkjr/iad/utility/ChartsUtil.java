@@ -65,31 +65,41 @@ public class ChartsUtil {
         return points;
     }
 
-    public static void plotAccuracy(List<Double> accuracy) {
-        XYSeries series = new XYSeries("graph");
+    public static void plotAccuracy(List<Double> accuracy, List<Double> testAccuracy, String fileName) {
+        XYSeries accuracySeries = new XYSeries("accuracy");
         for (int i = 0; i < accuracy.size(); ++i) {
-            series.add(i, accuracy.get(i));
+            accuracySeries.add(i, accuracy.get(i));
         }
+//        XYSeries testAccuracySeries = new XYSeries("test accuracy");
+//        for (int i = 0; i < accuracy.size(); ++i) {
+//            testAccuracySeries.add(i, testAccuracy.get(i));
+//        }
         XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(series);
-        JFreeChart plot = createXYLineChart("Accuracy", "Epochs", "Accuracy", dataset);
+        dataset.addSeries(accuracySeries);
+//        dataset.addSeries(testAccuracySeries);
+        JFreeChart plot = createXYLineChart("Accuracy", "Epochs * 50", "Accuracy", dataset);
         try {
-            saveChartAsJPEG(new File("./plots/accuracy.jpg"), plot, 600, 400);
+            saveChartAsJPEG(new File(fileName), plot, 600, 400);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void plotError(List<Double> accuracy) {
-        XYSeries series = new XYSeries("graph");
-        for (int i = 0; i < accuracy.size(); ++i) {
-            series.add(i, accuracy.get(i));
+    public static void plotError(List<Double> errors, List<Double> testErrors, String fileName) {
+        XYSeries errorSeries = new XYSeries("training set error");
+        for (int i = 0; i < errors.size(); ++i) {
+            errorSeries.add(i, errors.get(i));
         }
+//        XYSeries testErrorSeries = new XYSeries("test set error");
+//        for (int i = 0; i < testErrors.size(); ++i) {
+//            testErrorSeries.add(i, testErrors.get(i));
+//        }
         XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(series);
+        dataset.addSeries(errorSeries);
+//        dataset.addSeries(testErrorSeries);
         JFreeChart plot = createXYLineChart("Error", "Epochs", "Error", dataset);
         try {
-            saveChartAsJPEG(new File("./plots/error.jpg"), plot, 600, 400);
+            saveChartAsJPEG(new File(fileName), plot, 600, 400);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -136,7 +146,7 @@ public class ChartsUtil {
         JFreeChart plot = createScatterPlot("Initial function and approximation",
                 "x", "y", pointsCollection);
         try {
-            saveChartAsJPEG(new File("./plots/" + fileName + ".jpg"), plot, 600, 400);
+            saveChartAsJPEG(new File(fileName), plot, 600, 400);
         } catch (IOException e) {
             e.printStackTrace();
         }

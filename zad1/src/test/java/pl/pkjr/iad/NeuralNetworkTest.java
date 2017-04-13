@@ -28,7 +28,7 @@ public class NeuralNetworkTest {
         Matrix Y = new Basic2DMatrix(dataY);
         int[] neurons = {3, 2, 1};
         network = new NeuralNetworkWithBias(X, Y, 1, neurons, 0.1, 1, 1, 100,
-                CostFunctionType.logarithmic, sigmoid) {
+                0.5, CostFunctionType.logarithmic, sigmoid, null, null) {
         };
     }
 

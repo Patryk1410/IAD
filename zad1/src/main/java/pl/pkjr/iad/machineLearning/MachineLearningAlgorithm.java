@@ -10,11 +10,11 @@ import java.util.Arrays;
  */
 public class MachineLearningAlgorithm {
 
-    public static void gradientDescent(Matrix[] Theta, Matrix[] PreviousTheta, Matrix[] Gradients, double alpha,
+    public static void gradientDescent(Matrix[] Theta, Matrix[] Momentum, Matrix[] Gradients, double alpha,
                                        double mu) {
         for (int i = 0; i < Theta.length; ++i) {
-            PreviousTheta[i] = PreviousTheta[i].multiply(mu).subtract(Gradients[i].multiply(alpha));
-            Theta[i] = Theta[i].add(PreviousTheta[i]);
+            Momentum[i] = Momentum[i].multiply(mu).subtract(Gradients[i].multiply(alpha));
+            Theta[i] = Theta[i].add(Momentum[i]);
         }
     }
 }

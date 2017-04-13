@@ -2,7 +2,6 @@ package pl.pkjr.iad.machineLearning.neuralNetworks;
 
 import org.la4j.Matrix;
 import org.la4j.matrix.dense.Basic2DMatrix;
-import pl.pkjr.iad.machineLearning.neuralNetworks.NeuralNetwork;
 
 import java.util.ArrayList;
 
@@ -26,7 +25,9 @@ public class NeuralNetworkUtil {
         network.n = network.X.columns();
         network.m = network.X.rows();
         network.accuracyHistory = new ArrayList<>();
+        network.testAccuracyHistory = new ArrayList<>();
         network.errorHistory = new ArrayList<>();
+        network.testErrorHistory = new ArrayList<>();
         randomlyInitTheta();
         initPreviousTheta();
         initZ();
@@ -57,9 +58,9 @@ public class NeuralNetworkUtil {
     }
 
     private void initPreviousTheta() {
-        network.PreviousTheta = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
-        for (int i = 0; i < network.PreviousTheta.length; ++i) {
-            network.PreviousTheta[i] = Matrix.zero(network.Theta[i].rows(), network.Theta[i].columns());
+        network.Momentum = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
+        for (int i = 0; i < network.Momentum.length; ++i) {
+            network.Momentum[i] = Matrix.zero(network.Theta[i].rows(), network.Theta[i].columns());
         }
     }
 
@@ -73,7 +74,7 @@ public class NeuralNetworkUtil {
     }
 
     private void initDelta() {
-        network.Delta = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
+        network.Sigma = new Matrix[network.numberOfHiddenLayers + NUMBER_OF_OUTPUT_LAYERS];
     }
 
     private void initGradients() {

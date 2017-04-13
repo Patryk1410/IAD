@@ -5,7 +5,6 @@ import pl.pkjr.iad.machineLearning.costFunction.CostFunctionType;
 import pl.pkjr.iad.machineLearning.outputFunction.OutputFunctionType;
 import pl.pkjr.iad.utility.MatrixUtil;
 
-import static pl.pkjr.iad.utility.MatrixUtil.addColumnOfOnesToMatrix;
 import static pl.pkjr.iad.utility.MatrixUtil.sigmoid;
 
 /**
@@ -13,10 +12,11 @@ import static pl.pkjr.iad.utility.MatrixUtil.sigmoid;
  */
 public class NeuralNetworkWithoutBias extends NeuralNetwork {
     public NeuralNetworkWithoutBias(Matrix x, Matrix y, int numberOfHiddenLayers, int[] numbersOfNeuronsInEachLayer,
-                                    double alpha, double lambda, double epsilon, int maxEpochs,
-                                    CostFunctionType costFunction, OutputFunctionType outputFunction) {
-        super(x, y, numberOfHiddenLayers, numbersOfNeuronsInEachLayer, alpha, lambda, epsilon, maxEpochs, costFunction,
-                outputFunction);
+                                    double alpha, double lambda, double epsilon, int maxEpochs, double mu,
+                                    CostFunctionType costFunction, OutputFunctionType outputFunction, Matrix X_t,
+                                    Matrix Y_t) {
+        super(x, y, numberOfHiddenLayers, numbersOfNeuronsInEachLayer, alpha, lambda, epsilon, maxEpochs, mu,
+                costFunction, outputFunction, X_t, Y_t);
         util = new NeuralNetworkUtil(this, 0);
         util.initParameters();
     }
@@ -53,15 +53,15 @@ public class NeuralNetworkWithoutBias extends NeuralNetwork {
     protected void computeErrorsForLastHiddenLayer() {
         int indexOfOutputLayer = numberOfHiddenLayers;
         int indexOfLastHiddenLayer = numberOfHiddenLayers - 1;
-        Delta[indexOfLastHiddenLayer] = MatrixUtil.elementwiseMultiply(
-                Delta[indexOfOutputLayer].multiply(Theta[indexOfOutputLayer].transpose()),
+        Sigma[indexOfLastHiddenLayer] = MatrixUtil.elementwiseMultiply(
+                Sigma[indexOfOutputLayer].multiply(Theta[indexOfOutputLayer].transpose()),
                 MatrixUtil.sigmoidDerivative(Z[indexOfOutputLayer]));
     }
 
     @Override
     protected void computeErrorsForHiddenLayer(int index) {
-        Delta[index] = MatrixUtil.elementwiseMultiply(
-                Delta[index + 1].removeFirstColumn().multiply(Theta[index + 1].transpose()),
+        Sigma[index] = MatrixUtil.elementwiseMultiply(
+                Sigma[index + 1].removeFirstColumn().multiply(Theta[index + 1].transpose()),
                 MatrixUtil.sigmoidDerivative(Z[index + 1]));
     }
 
@@ -69,9 +69,9 @@ public class NeuralNetworkWithoutBias extends NeuralNetwork {
     protected void computeGradients() {
         for (int j = Gradients.length - 1; j >= 0; --j) {
             if (j == 0) {
-                Gradients[j] = Gradients[j].add(X.transpose().multiply(Delta[j]));
+                Gradients[j] = Gradients[j].add(X.transpose().multiply(Sigma[j]));
             } else {
-                Gradients[j] = Gradients[j].add(A[j - 1].transpose().multiply(Delta[j]));
+                Gradients[j] = Gradients[j].add(A[j - 1].transpose().multiply(Sigma[j]));
             }
         }
     }
