@@ -1,4 +1,6 @@
 import machineLearning.KohonenNeuralNetwork;
+import machineLearning.NeuralGas;
+import machineLearning.SelfOrganizingNeuralNetwork;
 import machineLearning.neighborhoodFunction.NeighborhoodFunctionType;
 import org.la4j.Matrix;
 import util.ChartsUtil;
@@ -17,10 +19,10 @@ public class App {
             datasetPath = "./datasets/dataset.txt";
         Matrix dataset = DatasetUtil.getInstance().readTestData(datasetPath);
         ChartsUtil.getInstance().plotDataset(plotPath, dataset);
-        KohonenNeuralNetwork network = new KohonenNeuralNetwork(5, dataset, 250, GAUSSIAN,
-                0.1, 0.5);
-        ChartsUtil.getInstance().plotNetworkState("./plots/solution.jpg", dataset, network.getTheta());
+        SelfOrganizingNeuralNetwork network = new NeuralGas(5, dataset, 250,
+                0.1, 0.25);
+//        ChartsUtil.getInstance().plotNetworkState("./plots/solution.jpg", dataset, network.getTheta());
         network.fit();
-        ChartsUtil.getInstance().plotNetworkState("./plots/fitted.jpg", dataset, network.getTheta());
+//        ChartsUtil.getInstance().plotNetworkState("./plots/fitted.jpg", dataset, network.getTheta());
     }
 }
