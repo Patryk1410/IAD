@@ -1,13 +1,10 @@
-import machineLearning.KohonenNeuralNetwork;
+import imageCompression.ImageCompressor;
+import machineLearning.KMeans;
 import machineLearning.NeuralGas;
 import machineLearning.SelfOrganizingNeuralNetwork;
-import machineLearning.neighborhoodFunction.NeighborhoodFunctionType;
 import org.la4j.Matrix;
 import util.ChartsUtil;
 import util.DatasetUtil;
-
-import static machineLearning.neighborhoodFunction.NeighborhoodFunctionType.GAUSSIAN;
-import static machineLearning.neighborhoodFunction.NeighborhoodFunctionType.RECTANGULAR;
 
 /**
  * Created by patry on 27/04/17.
@@ -15,14 +12,29 @@ import static machineLearning.neighborhoodFunction.NeighborhoodFunctionType.RECT
 public class App {
 
     public static void main(String[] args) {
+        runCompression();
+    }
+
+    private static void runNeuralNetwork() {
         String plotPath = "./plots/dataset.jpg",
-            datasetPath = "./datasets/dataset.txt";
+                datasetPath = "./datasets/dataset.txt";
         Matrix dataset = DatasetUtil.getInstance().readTestData(datasetPath);
         ChartsUtil.getInstance().plotDataset(plotPath, dataset);
         SelfOrganizingNeuralNetwork network = new NeuralGas(5, dataset, 250,
                 0.1, 0.25);
-//        ChartsUtil.getInstance().plotNetworkState("./plots/solution.jpg", dataset, network.getTheta());
         network.fit();
-//        ChartsUtil.getInstance().plotNetworkState("./plots/fitted.jpg", dataset, network.getTheta());
+    }
+
+    private static void runKMeans() {
+        String datasetPath = "./datasets/dataset.txt";
+        Matrix dataset = DatasetUtil.getInstance().readTestData(datasetPath);
+        KMeans kMeans = new KMeans(10, dataset, 250);
+        kMeans.fit();
+    }
+
+    private static void runCompression() {
+        String image = "bird";
+        ImageCompressor imageCompressor = new ImageCompressor(image, 16);
+        imageCompressor.compress();
     }
 }
