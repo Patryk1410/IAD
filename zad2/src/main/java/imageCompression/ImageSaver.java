@@ -25,4 +25,14 @@ public class ImageSaver {
             e.printStackTrace();
         }
     }
+
+    public void saveColors(int[] meanColors, BufferedImage image) {
+        int height = image.getHeight();
+        int width = image.getWidth();
+//        for (int c = 0; c < meanColors.length; ++c) {
+//            for (int i = 0; i < height; ++i) {
+//
+//            }
+//        }
+    }
 }

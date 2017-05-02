@@ -16,13 +16,13 @@ public class KMeans {
 
     private static final String plotsFolder = "KMeans";
     private static final double EPSILON = 7.0;
+    private static final double EPSILON_2 = 255.0;
 
     private int numberOfIterations;
     private Matrix x; //input data
     private Matrix centroidPositions;
     private int K; //number of centroids
     private List<Double> errorHistory;
-    private int[] assignemnts;
     private Matrix means;
 
     public KMeans(int numberOfIterations, Matrix x, int k) {
@@ -30,8 +30,17 @@ public class KMeans {
         this.x = x;
         K = k;
         initializePositions();
+//        initializePositionsForImageCompression();
         errorHistory = new ArrayList<>();
-        assignemnts = new int[x.rows()];
+        cleanMeans();
+    }
+
+    public KMeans(int numberOfIterations, Matrix x, int k, Matrix centroidPositions) {
+        this.numberOfIterations = numberOfIterations;
+        this.x = x;
+        this.K = k;
+        this.centroidPositions = centroidPositions;
+        errorHistory = new ArrayList<>();
         cleanMeans();
     }
 
@@ -83,7 +92,16 @@ public class KMeans {
         centroidPositions.each((int i, int j, double value) -> centroidPositions.set(i, j, Math.random() * 2 * EPSILON - EPSILON));
     }
 
+    private void initializePositionsForImageCompression() {
+        centroidPositions = new Basic2DMatrix(K, x.columns());
+        centroidPositions.each((int i, int j, double value) -> centroidPositions.set(i, j, Math.random() * EPSILON_2));
+    }
+
     private void cleanMeans() {
         means = Matrix.zero(K, x.columns() + 1);
+    }
+
+    public Matrix getCentroidPositions() {
+        return centroidPositions;
     }
 }

@@ -21,17 +21,17 @@ public class ImageReader {
 
     private ImageReader(){}
 
-    public int[][] getPixels(String path) {
+    public Pixel[][] getPixels(String path) {
         try {
             BufferedImage image = ImageIO.read(new File(path));
             int width = image.getWidth();
             int height = image.getHeight();
-//            Pixel[][] pixels = new Pixel[width][height];
-            int[][] pixels = new int[height][width];
+            Pixel[][] pixels = new Pixel[width][height];
+//            int[][] pixels = new int[height][width];
             for (int i = 0; i < height; ++i) {
                 for (int j = 0; j < width; ++j) {
                     int color = image.getRGB(i, j);
-                    pixels[i][j] = color;
+                    pixels[i][j] = new Pixel(color);
                 }
             }
             return pixels;

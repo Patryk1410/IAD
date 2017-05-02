@@ -33,8 +33,8 @@ public class App {
     }
 
     private static void runCompression() {
-        String image = "bird";
-        ImageCompressor imageCompressor = new ImageCompressor(image, 16);
+        String image = "test";
+        ImageCompressor imageCompressor = new ImageCompressor(image, 1024);
         imageCompressor.compress();
     }
 }
