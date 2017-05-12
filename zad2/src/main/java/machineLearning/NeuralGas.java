@@ -17,8 +17,9 @@ public class NeuralGas extends SelfOrganizingNeuralNetwork {
 
     private List<Integer> neuronOrder;
 
-    public NeuralGas(int numberOfIterations, Matrix x, int numberOfNeurons, double lambda, double alpha) {
-        super(numberOfIterations, x, numberOfNeurons, lambda, alpha, "NeuralGas");
+    public NeuralGas(int numberOfIterations, Matrix x, int numberOfNeurons, double lambda, double alpha,
+                     double adaptationPotential) {
+        super(numberOfIterations, x, numberOfNeurons, lambda, alpha, "NeuralGas", adaptationPotential);
         neuronOrder = new ArrayList<>();
         for (int i = 0; i < theta.rows(); ++i) {
             neuronOrder.add(i);
@@ -29,7 +30,7 @@ public class NeuralGas extends SelfOrganizingNeuralNetwork {
     protected int findBestMatchingUnit(Vector sample) {
         neuronOrder.sort(Comparator.comparingDouble(o
                 -> VectorUtil.getInstance().euclideanDistance(theta.getRow(o), sample)
-                + (potentials.get(o) < ADAPTATION_POTENTIAL ? ADAPTATION_PENALTY : 0.0)));
+                + (potentials.get(o) < adaptationPotential ? ADAPTATION_PENALTY : 0.0)));
         int index = 0;
         updatePotentials(neuronOrder.get(index));
         return neuronOrder.get(index);

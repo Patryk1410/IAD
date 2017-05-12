@@ -4,10 +4,13 @@ import org.la4j.Matrix;
 import org.la4j.Vector;
 import org.la4j.matrix.dense.Basic2DMatrix;
 import util.ChartsUtil;
+import util.FilesUtil;
 import util.VectorUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.CancellationException;
 
 /**
  * Created by patry on 01/05/17.
@@ -24,11 +27,13 @@ public class KMeans {
     private int K; //number of centroids
     private List<Double> errorHistory;
     private Matrix means;
+    private Random random;
 
     public KMeans(int numberOfIterations, Matrix x, int k) {
         this.numberOfIterations = numberOfIterations;
         this.x = x;
         K = k;
+        random = new Random();
         initializePositions();
 //        initializePositionsForImageCompression();
         errorHistory = new ArrayList<>();
@@ -46,10 +51,11 @@ public class KMeans {
 
     public void fit() {
         int lastColumnIndex = means.columns() - 1;
+        FilesUtil.getInstance().clearDirectory("./plots/KMeans");
         for (int i = 0; i < numberOfIterations; ++i) {
             System.out.println("Iteration: " + i);
             String filepath = "./plots/" + plotsFolder + "/state" + Integer.toString(i) + ".jpg";
-//            ChartsUtil.getInstance().plotNetworkState(filepath, x, centroidPositions);
+            ChartsUtil.getInstance().plotNetworkState(filepath, x, centroidPositions);
             for (int j = 0; j < x.rows(); ++j) {
                 Vector currentSample = x.getRow(j);
                 int closestCentroidIndex = findClosestCentroid(currentSample);
@@ -63,14 +69,18 @@ public class KMeans {
             for (int j = 0; j < centroidPositions.rows(); ++j) {
                 Vector mean = means.getRow(j);
                 for (int k = 0; k < mean.length() - 1; ++k) {
-                    double currentValue = mean.get(k);
+                    double currentValue = centroidPositions.get(j, k);
+                    double currentMeanValue = mean.get(k);
                     double numberOfOccurrences = mean.get(lastColumnIndex);
-                    double newValue = currentValue / numberOfOccurrences;
+                    double newValue = numberOfOccurrences == 0.0 ? currentValue : currentMeanValue / numberOfOccurrences;
                     centroidPositions.set(j, k, newValue);
                 }
             }
+            errorHistory.add(getError());
+            FilesUtil.getInstance().saveMeans(means, "./plots/KMeans_means/means" + i + ".txt");
             cleanMeans();
         }
+        FilesUtil.getInstance().saveErrorHistory(errorHistory, "./plots/KMeans/errorHistory.txt");
     }
 
     protected int findClosestCentroid(Vector sample) {
@@ -79,6 +89,7 @@ public class KMeans {
         for (int i = 0; i < centroidPositions.rows(); ++i) {
             Vector currentRow = centroidPositions.getRow(i);
             double distance = VectorUtil.getInstance().euclideanDistance(currentRow, sample);
+//            double distance = VectorUtil.getInstance().colorDistance(currentRow, sample);
             if (distance < lowestDistance) {
                 lowestDistance = distance;
                 bestMatchingUnitIndex = i;
@@ -87,9 +98,27 @@ public class KMeans {
         return bestMatchingUnitIndex;
     }
 
+    private double getError() {
+        double sum = 0;
+        for (int i = 0; i < x.rows(); ++i) {
+            Vector currentRow = x.getRow(i);
+            int closestCentroidIndex = findClosestCentroid(currentRow);
+            Vector closestCentroid = centroidPositions.getRow(closestCentroidIndex);
+            double distance = VectorUtil.getInstance().euclideanDistance(closestCentroid, currentRow);
+            sum += distance*distance;
+        }
+        return sum / x.rows();
+    }
+
     private void initializePositions() {
         centroidPositions = new Basic2DMatrix(K, x.columns());
-        centroidPositions.each((int i, int j, double value) -> centroidPositions.set(i, j, Math.random() * 2 * EPSILON - EPSILON));
+        for (int i = 0; i < centroidPositions.rows(); ++i) {
+            int randomPointIndex = random.nextInt(x.rows());
+            for (int j = 0; j < centroidPositions.columns(); ++j) {
+                double value = x.get(randomPointIndex, j);
+                centroidPositions.set(i, j, value);
+            }
+        }
     }
 
     private void initializePositionsForImageCompression() {
@@ -103,5 +132,18 @@ public class KMeans {
 
     public Matrix getCentroidPositions() {
         return centroidPositions;
+    }
+
+    public List<Double> getErrorHistory() {
+        return errorHistory;
+    }
+
+    public int getK() {
+        return K;
+    }
+
+    public double getLastError() {
+        int lastIndex = errorHistory.size() - 1;
+        return errorHistory.get(lastIndex);
     }
 }

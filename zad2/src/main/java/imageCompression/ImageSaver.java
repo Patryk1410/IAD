@@ -29,10 +29,14 @@ public class ImageSaver {
     public void saveColors(int[] meanColors, BufferedImage image) {
         int height = image.getHeight();
         int width = image.getWidth();
-//        for (int c = 0; c < meanColors.length; ++c) {
-//            for (int i = 0; i < height; ++i) {
-//
-//            }
-//        }
+        for (int c = 0; c < meanColors.length; ++c) {
+            for (int i = 0; i < height; ++i) {
+                for (int j = 0; j < width; ++j) {
+                    image.setRGB(i, j, meanColors[c]);
+                }
+            }
+            String path = "./pictures/colors/color" + c + ".jpg";
+            saveImage(image, path);
+        }
     }
 }

@@ -1,14 +1,16 @@
 package machineLearning;
 
-import machineLearning.neighborhoodFunction.NeighborhoodFunction;
 import org.la4j.Matrix;
 import org.la4j.Vector;
 import org.la4j.matrix.dense.Basic2DMatrix;
 import util.ChartsUtil;
-import util.VectorUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.io.FileUtils;
+import util.FilesUtil;
 
 /**
  * Created by patry on 01/05/17.
@@ -16,7 +18,7 @@ import java.util.List;
 public abstract class SelfOrganizingNeuralNetwork {
 
     protected static final double EPSILON = 7.0;
-    protected static final double ADAPTATION_POTENTIAL = 0.85;
+    protected static final double EPSILON_PRIME = 2.0;
 
     protected int numberOfIterations;
     protected Matrix x; //input data
@@ -28,18 +30,22 @@ public abstract class SelfOrganizingNeuralNetwork {
     protected Vector potentials;
     protected List<Double> errorHistory;
     protected String plotsFolder;
+    protected double adaptationPotential;
+    protected int iterationNumber;
 
     protected SelfOrganizingNeuralNetwork(int numberOfIterations, Matrix x, int numberOfNeurons, double lambda,
-                                          double alpha, String plotsFolder) {
+                                          double alpha, String plotsFolder, double adaptationPotential) {
         this.numberOfIterations = numberOfIterations;
         this.x = x;
         this.numberOfNeurons = numberOfNeurons;
         this.lambda = lambda;
         this.alpha = alpha;
         this.plotsFolder = plotsFolder;
+        this.adaptationPotential = adaptationPotential;
+        this.iterationNumber = 0;
         initializeTheta();
         bestMatchingUnits = new int[x.rows()];
-        potentials = Vector.constant(theta.rows(), ADAPTATION_POTENTIAL);
+        potentials = Vector.constant(theta.rows(), adaptationPotential);
         errorHistory = new ArrayList<>();
     }
 
@@ -55,34 +61,39 @@ public abstract class SelfOrganizingNeuralNetwork {
 
     private void initializeTheta() {
         theta = new Basic2DMatrix(numberOfNeurons, x.columns());
-        theta.each((int i, int j, double value) -> theta.set(i, j, Math.random() * 2 * EPSILON - EPSILON));
+        theta.each((int i, int j, double value) -> theta.set(i, j, Math.random() * 2 * EPSILON - EPSILON +
+                (j == 0 ? EPSILON_PRIME : (-1) * EPSILON_PRIME)));
     }
 
     public void fit() {
-        for (int i = 0; i < numberOfIterations; ++i) {
-            System.out.println("Iteration: " + i);
+        iterationNumber = 0;
+        FilesUtil.getInstance().clearDirectory("./plots/" + plotsFolder);
+        for (; iterationNumber < numberOfIterations; ++iterationNumber) {
+            System.out.println("Iteration: " + iterationNumber);
             for (int j = 0; j < x.rows(); ++j) {
                 if (j % (x.rows()/50) == 0) {
                     System.out.println("Sample: " + j);
-                    String filepath = "./plots/" + plotsFolder + "/state" + Integer.toString(j / (x.rows() / 50) + i * 50) + ".jpg";
+                    String filepath = "./plots/" + plotsFolder + "/state" + Integer.toString(j / (x.rows() / 50) + iterationNumber * 50) + ".jpg";
                     ChartsUtil.getInstance().plotNetworkState(filepath, x, theta);
                 }
                 Vector currentSample = x.getRow(j);
                 int bestMatchingUnitIndex = findBestMatchingUnit(currentSample);
                 bestMatchingUnits[j] = bestMatchingUnitIndex;
-                update(currentSample, bestMatchingUnitIndex, i);
+                update(currentSample, bestMatchingUnitIndex, iterationNumber);
             }
             double error = getQuantizationError();
             System.out.println("Error: " + error);
             errorHistory.add(error);
+            adaptationPotential *=  0.9;
         }
+        FilesUtil.getInstance().saveErrorHistory(errorHistory, "./plots/" + plotsFolder + "/errorHistory.txt");
     }
 
     protected abstract int findBestMatchingUnit(Vector sample);
 
     protected void updatePotentials(int bestMatchingUnitIndex) {
         potentials.each((int i, double value) -> {
-            double newValue = i != bestMatchingUnitIndex ? value + (1.0 / numberOfNeurons) : value - ADAPTATION_POTENTIAL;
+            double newValue = i != bestMatchingUnitIndex ? value + (1.0 / numberOfNeurons) : value - adaptationPotential;
             potentials.set(i, newValue);
         });
     }
@@ -107,5 +118,34 @@ public abstract class SelfOrganizingNeuralNetwork {
 
     public Matrix getTheta() {
         return theta;
+    }
+
+    public List<Double> getErrorHistory() {
+        return errorHistory;
+    }
+
+    public int getNumberOfNeurons() {
+        return numberOfNeurons;
+    }
+
+    public double getLambda() {
+        return lambda;
+    }
+
+    public double getAlpha() {
+        return alpha;
+    }
+
+    public Vector getPotentials() {
+        return potentials;
+    }
+
+    public double getAdaptationPotential() {
+        return adaptationPotential;
+    }
+
+    public double getLastError() {
+        int lastIndex = errorHistory.size() - 1;
+        return errorHistory.get(lastIndex);
     }
 }

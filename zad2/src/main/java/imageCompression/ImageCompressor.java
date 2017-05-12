@@ -3,7 +3,11 @@ package imageCompression;
 import machineLearning.KMeans;
 import model.Pixel;
 import org.la4j.Matrix;
+import org.la4j.Vector;
 import org.la4j.matrix.dense.Basic2DMatrix;
+import org.la4j.vector.dense.BasicVector;
+import util.FilesUtil;
+import util.VectorUtil;
 
 import java.awt.image.BufferedImage;
 
@@ -32,6 +36,7 @@ public class ImageCompressor {
 
     private void updateColors() {
         getMeanColors();
+        saveColors();
         BufferedImage largeImage = readLargeImage();
         int height = largeImage.getHeight();
         int width = largeImage.getWidth();
@@ -45,15 +50,39 @@ public class ImageCompressor {
         saveLargeImage(largeImage);
     }
 
+    private void saveColors() {
+        FilesUtil.getInstance().clearDirectory("./pictures/colors");
+        String smallImagePath = "./pictures/" + imageName + "_small.jpg";
+        BufferedImage image = ImageReader.getInstance().getImage(smallImagePath);
+        ImageSaver.getInstance().saveColors(meanColors, image);
+    }
+
     private void saveLargeImage(BufferedImage largeImage) {
         String path = "./pictures/" + imageName + "_compressed.jpg";
         ImageSaver.getInstance().saveImage(largeImage, path);
     }
 
     private int findNewColor(int color) {
-        int newColor = Integer.MAX_VALUE;
-        for (int i = 0; i < meanColors.length; ++i) {
-            if (meanColors[i] != 0 && Math.abs(color - meanColors[i]) < Math.abs(color - newColor)) {
+        int newColor = meanColors[0];
+        for (int i = 1; i < meanColors.length; ++i) {
+//            if (meanColors[i] != 0 && Math.abs(color - meanColors[i]) < Math.abs(color - newColor)) {
+            int red = (color >> 16) & 0x000000FF;
+            int green = (color >> 8) & 0x000000FF;
+            int blue = color & 0x000000FF;
+            int newRed = (newColor >> 16) & 0x000000FF;
+            int newGreen = (newColor >> 8) & 0x000000FF;
+            int newBlue = newColor & 0x000000FF;
+            int meanRed = (meanColors[i] >> 16) & 0x000000FF;
+            int meanGreen = (meanColors[i] >> 8) & 0x000000FF;
+            int meanBlue = meanColors[i] & 0x000000FF;
+            double[] colorArr = {red, green, blue};
+            double[] newColorArr = {newRed, newGreen, newBlue};
+            double[] meanColorArr = {meanRed, meanGreen, meanBlue};
+            Vector colorVector = new BasicVector(colorArr);
+            Vector newColorVector = new BasicVector(newColorArr);
+            Vector meanColorVector = new BasicVector(meanColorArr);
+            if (VectorUtil.getInstance().euclideanDistance(colorVector, meanColorVector)
+                    < VectorUtil.getInstance().euclideanDistance(colorVector, newColorVector)) {
                 newColor = meanColors[i];
             }
         }
@@ -70,8 +99,8 @@ public class ImageCompressor {
 
     private void initKMeans(BufferedImage image, Pixel[][] pixels) {
         Matrix dataset = createDataset(image, pixels);
-        Matrix centroids = getInitialCentroidPosiions(image);
-        kMeans = new KMeans(30, dataset, numberOfColors, centroids);
+//        Matrix centroids = getInitialCentroidPosiions(image);
+        kMeans = new KMeans(30, dataset, numberOfColors);
     }
 
     private Matrix createDataset(BufferedImage image, Pixel[][] pixels) {
