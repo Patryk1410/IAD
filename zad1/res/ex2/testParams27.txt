@@ -1,0 +1,12 @@
+K1:
+precision: 0.844
+recall: 0.900
+f1: 0.871
+K2:
+precision: 0.462
+recall: 0.200
+f1: 0.279
+K3:
+precision: 0.556
+recall: 0.833
+f1: 0.667

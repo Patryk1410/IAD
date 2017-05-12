@@ -1,0 +1,12 @@
+		\begin{table}[H]
+			\setlength\extrarowheight{15pt}
+			\begin{tabular}{|c|c|c|c|c|}
+				\cline{3-5}
+				\multicolumn{1}{c}{ }&\multicolumn{1}{c|}{ }& \multicolumn{3}{c|}{Wartość przewidziana}  \\
+				\cline{3-5}
+				\multicolumn{1}{c}{ }&\multicolumn{1}{c|}{ }&K1&K2&K3\\
+				\hline
+				\parbox[t]{2mm}{\multirow{3}{*}{\rotatebox[origin=c]{90}{Wartość oczekiwana}}}
+				& K1&27&3&0\\\cline{2-5}
+				& K2&7&7&16\\\cline{2-5}
+				& K3&2&4&24\\\hline
