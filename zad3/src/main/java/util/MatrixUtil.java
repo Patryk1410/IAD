@@ -2,6 +2,7 @@ package util;
 
 import org.la4j.Matrix;
 import org.la4j.Vector;
+import org.la4j.matrix.dense.Basic2DMatrix;
 
 /**
  * Created by patry on 23/05/17.
@@ -61,5 +62,14 @@ public class MatrixUtil {
 
     private double sigmoid(double value) {
         return 1 / (1 + Math.exp(-value));
+    }
+
+    public Matrix elementwiseMultiply(Matrix M1, Matrix M2) {
+        if (M1.rows() != M2.rows() || M1.columns() != M2.columns()) {
+            throw new IllegalArgumentException("Matrices must be of the same size");
+        }
+        Matrix newMatrix = new Basic2DMatrix(M1.rows(), M1.columns());
+        newMatrix.each((int i, int j, double value) -> newMatrix.set(i, j, M1.get(i, j) * M2.get(i, j)));
+        return newMatrix;
     }
 }

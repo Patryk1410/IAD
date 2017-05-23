@@ -12,6 +12,8 @@ import org.la4j.matrix.dense.Basic2DMatrix;
 import util.MatrixUtil;
 import util.VectorUtil;
 
+import java.util.List;
+
 /**
  * Created by patry on 20/05/17.
  */
@@ -32,9 +34,17 @@ public class RadialNeuralNetwork {
     private Matrix outputLayerInputs;
     private Matrix outputLayerOutputs;
 
+    private Matrix errorsOnOutputLayer;
+    private Matrix errorsOnHiddenLayer;
+    private Matrix errorsOnWeights;
+
     private int numberOfNeuronsInHiddenLayer;
     private int numberOfNeuronsInOutputLayer;
     private int numberOfIterations;
+
+    private MatrixUtil matrixUtil;
+
+    private List<Double> errorHistory;
 
     private double alpha; //learning rate
 
@@ -44,16 +54,19 @@ public class RadialNeuralNetwork {
         this.x = x;
         this.y = y;
         this.alpha = alpha;
-        r = new Basic2DMatrix(this.numberOfNeuronsInHiddenLayer, x.columns());
         this.numberOfNeuronsInHiddenLayer = numberOfNeuronsInHiddenLayer;
         this.numberOfNeuronsInOutputLayer = numberOfNeuronsInOutputLayer;
         this.numberOfIterations = numberOfIterations;
+        matrixUtil = MatrixUtil.getInstance();
         randomlyInitTheta();
         positionTrainer = PositionTrainerSelector.getInstance().selectTrainer(trainerType);
         outputFunction = OutputFunctionSelector.getInstance().getOutputFunction(outputFunctionType);
         this.hiddenLayerOutputs = new Basic2DMatrix(x.rows(), numberOfNeuronsInHiddenLayer);
         this.outputLayerInputs = new Basic2DMatrix(x.rows(), numberOfNeuronsInOutputLayer);
         this.outputLayerOutputs = new Basic2DMatrix(x.rows(), numberOfNeuronsInOutputLayer);
+        this.errorsOnOutputLayer = new Basic2DMatrix(numberOfNeuronsInOutputLayer, 1);
+        this.errorsOnHiddenLayer = new Basic2DMatrix(numberOfNeuronsInHiddenLayer + 1, 1);
+        this.errorsOnWeights = new Basic2DMatrix(numberOfNeuronsInOutputLayer, numberOfNeuronsInHiddenLayer + 1);
     }
 
     private void randomlyInitTheta() {
@@ -87,13 +100,23 @@ public class RadialNeuralNetwork {
     }
 
     private void computeOutputLayer() {
-        Matrix hiddenLayerOutputsWithBias = MatrixUtil.getInstance().addColumnOfOnesToMatrix(hiddenLayerOutputs);
+        Matrix hiddenLayerOutputsWithBias = matrixUtil.addColumnOfOnesToMatrix(hiddenLayerOutputs);
         outputLayerInputs = hiddenLayerOutputsWithBias.multiply(theta.transpose());
         outputLayerOutputs = outputFunction.activate(outputLayerInputs);
     }
 
     private void backPropagate() {
-        //TODO: implement
+        computeErrors();
+        gradientDescent();
+    }
+
+    private void computeErrors() {
+        errorsOnOutputLayer = outputLayerOutputs.subtract(y);
+        errorsOnWeights = errorsOnOutputLayer.transpose().multiply(matrixUtil.addColumnOfOnesToMatrix(hiddenLayerOutputs));
+    }
+
+    private void gradientDescent() {
+        theta = theta.add(errorsOnWeights.multiply(alpha));
     }
 
     private void trainHiddenLayer() {
