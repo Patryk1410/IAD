@@ -5,8 +5,7 @@ package cli;
  */
 public enum ExerciseEnum {
     exercise1(1),
-    exercise2(2),
-    exercise3(3);
+    exercise2(2);
 
     private int value;
 

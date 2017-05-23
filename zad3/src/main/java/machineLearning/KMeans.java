@@ -93,21 +93,13 @@ public class KMeans {
             int closestCentroidIndex = findClosestCentroid(currentRow);
             Vector closestCentroid = centroidPositions.getRow(closestCentroidIndex);
             double distance = VectorUtil.getInstance().euclideanDistance(closestCentroid, currentRow);
-            sum += distance*distance;
+            sum += distance * distance;
         }
         return sum / x.rows();
     }
 
     private void initializePositions() {
-//        centroidPositions = new Basic2DMatrix(K, x.columns());
         centroidPositions = MachineLearningUtil.getInstance().setRandomPositions(x, K);
-//        for (int i = 0; i < centroidPositions.rows(); ++i) {
-//            int randomPointIndex = random.nextInt(x.rows());
-//            for (int j = 0; j < centroidPositions.columns(); ++j) {
-//                double value = x.get(randomPointIndex, j);
-//                centroidPositions.set(i, j, value);
-//            }
-//        }
     }
 
     private void cleanMeans() {
