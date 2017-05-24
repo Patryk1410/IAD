@@ -30,7 +30,7 @@ public class KNearestNeighbors {
         for (int i = 0; i < x.rows(); ++i) {
             neuronOrder.add(i);
         }
-        weights = new Basic2DMatrix(K, x.columns());
+        weights = new Basic2DMatrix(positions.rows(), x.columns());
     }
 
     public void fit() {

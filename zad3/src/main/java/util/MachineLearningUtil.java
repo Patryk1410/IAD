@@ -12,7 +12,7 @@ public class MachineLearningUtil {
 
     Random random = new Random();
 
-    private static MachineLearningUtil instance;
+    private static MachineLearningUtil instance = new MachineLearningUtil();
 
     public static MachineLearningUtil getInstance() {
         return instance;

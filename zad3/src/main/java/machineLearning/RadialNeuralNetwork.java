@@ -12,6 +12,7 @@ import org.la4j.matrix.dense.Basic2DMatrix;
 import util.MatrixUtil;
 import util.VectorUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +36,6 @@ public class RadialNeuralNetwork {
     private Matrix outputLayerOutputs;
 
     private Matrix errorsOnOutputLayer;
-    private Matrix errorsOnHiddenLayer;
     private Matrix errorsOnWeights;
 
     private int numberOfNeuronsInHiddenLayer;
@@ -65,8 +65,8 @@ public class RadialNeuralNetwork {
         this.outputLayerInputs = new Basic2DMatrix(x.rows(), numberOfNeuronsInOutputLayer);
         this.outputLayerOutputs = new Basic2DMatrix(x.rows(), numberOfNeuronsInOutputLayer);
         this.errorsOnOutputLayer = new Basic2DMatrix(numberOfNeuronsInOutputLayer, 1);
-        this.errorsOnHiddenLayer = new Basic2DMatrix(numberOfNeuronsInHiddenLayer + 1, 1);
         this.errorsOnWeights = new Basic2DMatrix(numberOfNeuronsInOutputLayer, numberOfNeuronsInHiddenLayer + 1);
+        errorHistory = new ArrayList<>();
     }
 
     private void randomlyInitTheta() {
@@ -79,6 +79,7 @@ public class RadialNeuralNetwork {
         for (int i = 0; i < numberOfIterations; i++) {
             forwardPropagate();
             backPropagate();
+            errorHistory.add(J());
         }
     }
 
@@ -111,7 +112,7 @@ public class RadialNeuralNetwork {
     }
 
     private void computeErrors() {
-        errorsOnOutputLayer = outputLayerOutputs.subtract(y);
+        errorsOnOutputLayer = y.subtract(outputLayerOutputs);
         errorsOnWeights = errorsOnOutputLayer.transpose().multiply(matrixUtil.addColumnOfOnesToMatrix(hiddenLayerOutputs));
     }
 
@@ -132,5 +133,26 @@ public class RadialNeuralNetwork {
         KNearestNeighbors kNearestNeighbors = new KNearestNeighbors(15, x, c);
         kNearestNeighbors.fit();
         r = kNearestNeighbors.getWeights();
+    }
+
+    public Matrix predict(Vector sample) {
+        Matrix hiddenLayerOutput = new Basic2DMatrix(1, hiddenLayerOutputs.columns());
+        for (int j = 0; j < hiddenLayerOutputs.columns(); j++) {
+            Vector neuron = c.getRow(j);
+            double value = VectorUtil.getInstance().euclideanDistance(sample, neuron);
+            double radius = r.get(j, 0);
+            hiddenLayerOutput.set(0, j, Math.exp(-((value * value) / (radius * radius))));
+        }
+        hiddenLayerOutput = matrixUtil.addColumnOfOnesToMatrix(hiddenLayerOutput);
+        Matrix outputLayerInput = hiddenLayerOutput.multiply(theta.transpose());
+        return outputFunction.activate(outputLayerInput);
+    }
+
+    private double J() {
+        return matrixUtil.square(y.subtract(outputLayerOutputs)).sum() / x.rows();
+    }
+
+    public List<Double> getErrorHistory() {
+        return errorHistory;
     }
 }
