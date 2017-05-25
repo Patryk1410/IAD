@@ -5,6 +5,7 @@ import machineLearning.outputFunction.OutputFunctionType;
 import machineLearning.positionTrainer.PositionTrainerType;
 import org.la4j.Matrix;
 import util.ChartsUtil;
+import util.FilesUtil;
 import util.MatrixUtil;
 
 import java.util.HashMap;
@@ -74,9 +75,17 @@ public class ApproximationExercise implements InterfaceModule {
     private void trainNetwork() {
         RadialNeuralNetwork network = new RadialNeuralNetwork(X, Y, alpha, PositionTrainerType.random, numberOfNeuronsInHiddenLayer,
                 1, maxEpochs, OutputFunctionType.linear);
+//        network.partialFit1();
+//        ChartsUtil.getInstance().plotFunctionAndApproximation(X, Y, network, "./charts/approx_2.jpg");
         network.fit();
+//        network.partialFit2();
+        saveResults(network);
+    }
+
+    private void saveResults(RadialNeuralNetwork network) {
         ChartsUtil.getInstance().plotFunctionAndApproximation(X, Y, network, "./charts/approx.jpg");
         ChartsUtil.getInstance().plotErrorHistory(network.getErrorHistory(), "./charts/errors.jpg");
+        FilesUtil.getInstance().saveRadialNeuronsPositions(network, "./charts/positions.txt");
     }
 
     @Override

@@ -21,13 +21,16 @@ public class MachineLearningUtil {
     private MachineLearningUtil(){}
 
     public Matrix setRandomPositions(Matrix x, int k) {
+        //TODO: sometimes it chooses the same position multiple times
         Matrix res = new Basic2DMatrix(k, x.columns());
+        Matrix copy = x.copy();
         for (int i = 0; i < res.rows(); ++i) {
-            int randomPointIndex = random.nextInt(x.rows());
+            int randomPointIndex = random.nextInt(copy.rows());
             for (int j = 0; j < res.columns(); ++j) {
-                double value = x.get(randomPointIndex, j);
+                double value = copy.get(randomPointIndex, j);
                 res.set(i, j, value);
             }
+            copy = copy.removeRow(randomPointIndex);
         }
         return res;
     }

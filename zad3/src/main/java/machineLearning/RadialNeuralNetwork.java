@@ -21,6 +21,8 @@ import java.util.List;
 public class RadialNeuralNetwork {
 
     private static final double EPSILON = 1;
+    private static final double STOP_CONDITION = 0.0001;
+    private static final double STOP_ERROR = 0.01;
 
     private PositionTrainer positionTrainer;
     private OutputFunction outputFunction;
@@ -48,6 +50,8 @@ public class RadialNeuralNetwork {
 
     private double alpha; //learning rate
 
+    private int stopCounter = 0;
+
     public RadialNeuralNetwork(Matrix x, Matrix y, double alpha, PositionTrainerType trainerType,
                                int numberOfNeuronsInHiddenLayer, int numberOfNeuronsInOutputLayer,
                                int numberOfIterations, OutputFunctionType outputFunctionType) {
@@ -74,13 +78,39 @@ public class RadialNeuralNetwork {
         theta.each((i, j, v) -> theta.set(i, j,Math.random() * 2 * EPSILON - EPSILON));
     }
 
-    public void fit() {
+    public void partialFit1() {
         trainHiddenLayer();
-        for (int i = 0; i < numberOfIterations; i++) {
+        errorHistory.add(J());
+    }
+
+    public void partialFit2() {
+        for (int i = 0; i < numberOfIterations && !shouldFinish(i); i++) {
             forwardPropagate();
             backPropagate();
             errorHistory.add(J());
         }
+    }
+
+    public void fit() {
+        trainHiddenLayer();
+        errorHistory.add(J());
+        for (int i = 0; i < numberOfIterations && !shouldFinish(i); i++) {
+            forwardPropagate();
+            backPropagate();
+            errorHistory.add(J());
+        }
+    }
+
+    private boolean shouldFinish(int i) {
+        if (i > 0 && Math.abs(errorHistory.get(i) - errorHistory.get(i - 1)) < STOP_CONDITION) {
+            ++stopCounter;
+            if (stopCounter > 20) {
+                return true;
+            }
+        } else {
+            stopCounter = 0;
+        }
+        return errorHistory.get(i) <= STOP_ERROR;
     }
 
     private void forwardPropagate() {
@@ -130,7 +160,7 @@ public class RadialNeuralNetwork {
     }
 
     private void computeNeuronsWidths() {
-        KNearestNeighbors kNearestNeighbors = new KNearestNeighbors(15, x, c);
+        KNearestNeighbors kNearestNeighbors = new KNearestNeighbors(x.rows() / 5, x, c);
         kNearestNeighbors.fit();
         r = kNearestNeighbors.getWeights();
     }
@@ -154,5 +184,13 @@ public class RadialNeuralNetwork {
 
     public List<Double> getErrorHistory() {
         return errorHistory;
+    }
+
+    public Matrix getC() {
+        return c;
+    }
+
+    public Matrix getR() {
+        return r;
     }
 }
